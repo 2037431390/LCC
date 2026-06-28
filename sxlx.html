@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数学练习导航</title>
+    <style>
+        body {
+            font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            position: relative;
+        }
+        .back-button {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            padding: 12px 20px 12px 15px;
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            border: none;
+            outline: none;
+            font-size: 16px;
+        }
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(108, 92, 231, 0.4);
+            background: linear-gradient(135deg, #5d4aec 0%, #9489f4 100%);
+        }
+        .back-button:active {
+            transform: translateY(1px);
+        }
+        .back-button::before {
+            content: '';
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            transition: transform 0.3s;
+        }
+        .back-button:hover::before {
+            transform: translateX(-3px);
+        }
+        .container {
+            background-color: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin: 80px auto 30px;
+            max-width: 600px;
+            position: relative;
+            overflow: hidden;
+        }
+        .container::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, #6c5ce7, #00cec9);
+        }
+        h1 {
+            color: #2d3436;
+            margin-bottom: 40px;
+            font-size: 28px;
+            position: relative;
+            text-align: center;
+        }
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #6c5ce7, #00cec9);
+            border-radius: 3px;
+        }
+        .practice-button {
+            background: linear-gradient(135deg, #00b894 0%, #55efc4 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            font-size: 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 6px 12px rgba(0, 184, 148, 0.2);
+            margin: 25px auto;
+            width: 80%;
+            max-width: 300px;
+            font-weight: bold;
+            display: block;
+        }
+        .practice-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 184, 148, 0.3);
+            background: linear-gradient(135deg, #00a884 0%, #4ad4b4 100%);
+        }
+        .practice-button:active {
+            transform: translateY(1px);
+            box-shadow: 0 4px 8px rgba(0, 184, 148, 0.2);
+        }
+        .description {
+            color: #636e72;
+            margin-top: 40px;
+            font-size: 16px;
+            text-align: center;
+            line-height: 1.6;
+        }
+        .icon {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 600px) {
+            body {
+                padding: 15px;
+            }
+            .back-button {
+                top: 15px;
+                left: 15px;
+                padding: 10px 15px;
+            }
+            .container {
+                padding: 30px 20px;
+                margin-top: 60px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            .practice-button {
+                padding: 14px 20px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 返回按钮 -->
+    <a href="xxly.html" class="back-button">返回学习乐园</a>
+
+    <div class="container">
+        <h1>数学练习导航</h1>
+        
+        <button class="practice-button" onclick="window.location.href='level.html'">
+            <span class="icon">🧮</span>每日四则运算练习
+        </button>
+        
+        <p class="description">点击上方按钮开始每日数学练习<br>包含加减乘除四则运算题目，提升计算能力</p>
+    </div>
+</body>
+</html>

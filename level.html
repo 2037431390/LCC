@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每日四则运算练习</title>
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #6b8cae;
+            --accent-color: #ff7e5f;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            padding: 30px;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+        
+        .return-btn {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .return-btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            padding: 0;
+        }
+        
+        .header {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--accent-color);
+        }
+        
+        .content {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .settings {
+            grid-column: 1 / -1;
+            background-color: var(--light-color);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .settings-title {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .settings-title i {
+            font-size: 1.5rem;
+        }
+        
+        .slider-container {
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .slider-container label {
+            width: 120px;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+        
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            -webkit-appearance: none;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            border-radius: 10px;
+            outline: none;
+            margin: 0 15px;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border: 3px solid var(--accent-color);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+        
+        .slider-value {
+            width: 50px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--primary-color);
+            background: rgba(74, 111, 165, 0.1);
+            padding: 5px;
+            border-radius: 5px;
+        }
+        
+        .operation-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 25px 0;
+        }
+        
+        .operation-selector label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background-color: rgba(74, 111, 165, 0.1);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .operation-selector label:hover {
+            background-color: rgba(74, 111, 165, 0.2);
+        }
+        
+        .operation-selector input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary-color);
+            cursor: pointer;
+        }
+        
+        button {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            opacity: 0.9;
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        #startBtn {
+            background: linear-gradient(to right, #4a6fa5, #6b8cae);
+            font-size: 1.1rem;
+            padding: 15px 30px;
+            margin: 20px auto;
+            display: block;
+        }
+        
+        #resetBtn {
+            background: linear-gradient(to right, #6c757d, #868e96);
+        }
+        
+        #submitBtn {
+            background: linear-gradient(to right, var(--success-color), #5cb85c);
+        }
+        
+        .quiz-area {
+            display: none;
+            grid-column: 1 / -1;
+        }
+        
+        .daily-goal {
+            background: linear-gradient(to right, var(--warning-color), #ffd351);
+            color: var(--dark-color);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 25px;
+            font-weight: 600;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .quiz-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .question-area {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .question {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 20px 0;
+            color: var(--primary-color);
+            text-align: center;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .answer-input {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        input[type="number"] {
+            padding: 15px;
+            font-size: 1.5rem;
+            width: 150px;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+        
+        input[type="number"]:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
+        }
+        
+        .feedback {
+            font-size: 1.2rem;
+            margin: 15px 0;
+            min-height: 30px;
+            text-align: center;
+            padding: 10px;
+            border-radius: var(--border-radius);
+        }
+        
+        .correct {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: var(--success-color);
+        }
+        
+        .incorrect {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: var(--danger-color);
+        }
+        
+        .stats-section {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-item {
+            background-color: var(--light-color);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            transition: var(--transition);
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-item span {
+            display: block;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-top: 5px;
+        }
+        
+        .wrong-questions, .training-records {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-top: 30px;
+            grid-column: 1 / -1;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(74, 111, 165, 0.1);
+        }
+        
+        .wrong-questions {
+            max-height: 250px;
+            overflow-y: auto;
+        }
+        
+        .wrong-questions-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .wrong-question-item {
+            background-color: rgba(220, 53, 69, 0.05);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid var(--danger-color);
+        }
+        
+        .training-records {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .record-item {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .record-item:last-child {
+            border-bottom: none;
+        }
+        
+        .completed {
+            color: var(--success-color);
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+            
+            .quiz-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .return-btn {
+                top: 15px;
+                left: 15px;
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <a href="sxlx.html" class="return-btn">
+        <i class="fas fa-arrow-left"></i> 返回
+    </a>
+    
+    <div class="container">
+        <div class="header">
+            <h1>每日四则运算练习</h1>
+            <p>提升数学能力，每天进步一点点</p>
+        </div>
+        
+        <div class="content">
+            <div class="settings">
+                <h2 class="settings-title">
+                    <i class="fas fa-cog"></i> 练习设置
+                </h2>
+                
+                <div class="slider-container">
+                    <label for="maxValue">最大值:</label>
+                    <input type="range" id="maxValue" min="10" max="100" value="20">
+                    <span class="slider-value" id="maxValueValue">20</span>
+                </div>
+                
+                <div class="slider-container">
+                    <label for="minValue">最小值:</label>
+                    <input type="range" id="minValue" min="0" max="10" value="0">
+                    <span class="slider-value" id="minValueValue">0</span>
+                </div>
+                
+                <div class="slider-container">
+                    <label for="dailyGoal">每日目标:</label>
+                    <input type="range" id="dailyGoal" min="5" max="50" value="10">
+                    <span class="slider-value" id="dailyGoalValue">10</span>
+                </div>
+                
+                <div class="operation-selector">
+                    <label><input type="checkbox" id="addCheckbox" checked> <i class="fas fa-plus"></i> 加法</label>
+                    <label><input type="checkbox" id="subCheckbox" checked> <i class="fas fa-minus"></i> 减法</label>
+                    <label><input type="checkbox" id="mulCheckbox" checked> <i class="fas fa-times"></i> 乘法</label>
+                    <label><input type="checkbox" id="divCheckbox" checked> <i class="fas fa-divide"></i> 除法</label>
+                </div>
+            </div>
+            
+            <button id="startBtn">
+                <i class="fas fa-play"></i> 开始今日练习
+            </button>
+            <button id="resetBtn" style="display: none;">
+                <i class="fas fa-redo"></i> 重新设置
+            </button>
+            
+            <div id="quizArea" class="quiz-area">
+                <div class="daily-goal" id="dailyGoalDisplay">
+                    今日目标: 10题 | 已完成: <span id="completedCount">0</span>题
+                </div>
+                
+                <div class="quiz-section">
+                    <div class="question-area">
+                        <div class="question" id="question"></div>
+                        
+                        <div class="answer-input">
+                            <input type="number" id="answer" placeholder="输入答案">
+                            <button id="submitBtn">
+                                <i class="fas fa-check"></i> 提交答案
+                            </button>
+                        </div>
+                        
+                        <div class="feedback" id="feedback"></div>
+                    </div>
+                    
+                    <div class="stats-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-chart-bar"></i> 练习统计
+                        </h3>
+                        
+                        <div class="stats">
+                            <div class="stat-item">
+                                已答题
+                                <span id="totalCount">0</span>
+                            </div>
+                            <div class="stat-item">
+                                正确
+                                <span id="correctCount">0</span>
+                            </div>
+                            <div class="stat-item">
+                                正确率
+                                <span id="accuracy">0</span>%
+                            </div>
+                            <div class="stat-item">
+                                待重做
+                                <span id="reviewCount">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="wrong-questions" id="wrongQuestions">
+                    <h3 class="section-title">
+                        <i class="fas fa-exclamation-triangle"></i> 错题列表
+                    </h3>
+                    <div class="wrong-questions-list" id="wrongQuestionsList"></div>
+                </div>
+                
+                <div class="training-records" id="trainingRecords">
+                    <h3 class="section-title">
+                        <i class="fas fa-history"></i> 训练记录
+                    </h3>
+                    <div id="recordsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const quizArea = document.getElementById('quizArea');
+        const questionEl = document.getElementById('question');
+        const answerEl = document.getElementById('answer');
+        const submitBtn = document.getElementById('submitBtn');
+        const feedbackEl = document.getElementById('feedback');
+        const maxValueSlider = document.getElementById('maxValue');
+        const maxValueValue = document.getElementById('maxValueValue');
+        const minValueSlider = document.getElementById('minValue');
+        const minValueValue = document.getElementById('minValueValue');
+        const dailyGoalSlider = document.getElementById('dailyGoal');
+        const dailyGoalValue = document.getElementById('dailyGoalValue');
+        const dailyGoalDisplay = document.getElementById('dailyGoalDisplay');
+        const completedCountEl = document.getElementById('completedCount');
+        const addCheckbox = document.getElementById('addCheckbox');
+        const subCheckbox = document.getElementById('subCheckbox');
+        const mulCheckbox = document.getElementById('mulCheckbox');
+        const divCheckbox = document.getElementById('divCheckbox');
+        const totalCountEl = document.getElementById('totalCount');
+        const correctCountEl = document.getElementById('correctCount');
+        const accuracyEl = document.getElementById('accuracy');
+        const reviewCountEl = document.getElementById('reviewCount');
+        const wrongQuestionsList = document.getElementById('wrongQuestionsList');
+        const recordsList = document.getElementById('recordsList');
+        
+        let num1, num2, correctAnswer, operation;
+        let maxValue = 20;
+        let minValue = 0;
+        let dailyGoal = 10;
+        let totalQuestions = 0;
+        let correctAnswers = 0;
+        let completedQuestions = 0;
+        let wrongQuestions = [];
+        let questionsSinceLastReview = 0;
+        let trainingRecords = JSON.parse(localStorage.getItem('trainingRecords')) || [];
+        let todayRecord = null;
+        const today = new Date().toLocaleDateString();
+        
+        // 初始化滑块显示值
+        maxValueValue.textContent = maxValueSlider.value;
+        minValueValue.textContent = minValueSlider.value;
+        dailyGoalValue.textContent = dailyGoalSlider.value;
+        
+        // 检查今天是否已有记录
+        todayRecord = trainingRecords.find(record => record.date === today);
+        if (todayRecord) {
+            startBtn.innerHTML = '<i class="fas fa-play"></i> 继续今日练习';
+            updateRecordsList();
+        }
+        
+        // 更新滑块显示值
+        maxValueSlider.addEventListener('input', function() {
+            maxValue = parseInt(this.value);
+            maxValueValue.textContent = maxValue;
+        });
+        
+        minValueSlider.addEventListener('input', function() {
+            minValue = parseInt(this.value);
+            minValueValue.textContent = minValue;
+        });
+        
+        dailyGoalSlider.addEventListener('input', function() {
+            dailyGoal = parseInt(this.value);
+            dailyGoalValue.textContent = dailyGoal;
+            dailyGoalDisplay.textContent = `今日目标: ${dailyGoal}题 | 已完成: ${completedQuestions}题`;
+        });
+        
+        startBtn.addEventListener('click', function() {
+            // 检查至少选择了一种运算
+            if (!addCheckbox.checked && !subCheckbox.checked && !mulCheckbox.checked && !divCheckbox.checked) {
+                feedbackEl.textContent = '请至少选择一种运算类型！';
+                feedbackEl.className = 'feedback incorrect';
+                return;
+            }
+            
+            // 如果是新的一天，创建新记录
+            if (!todayRecord) {
+                todayRecord = {
+                    date: today,
+                    goal: dailyGoal,
+                    completed: 0,
+                    correct: 0,
+                    accuracy: 0
+                };
+                trainingRecords.unshift(todayRecord);
+                saveRecords();
+            }
+            
+            startBtn.style.display = 'none';
+            resetBtn.style.display = 'inline-block';
+            quizArea.style.display = 'block';
+            generateQuestion();
+        });
+        
+        resetBtn.addEventListener('click', function() {
+            resetBtn.style.display = 'none';
+            quizArea.style.display = 'none';
+            startBtn.style.display = 'inline-block';
+            totalQuestions = 0;
+            correctAnswers = 0;
+            completedQuestions = 0;
+            wrongQuestions = [];
+            questionsSinceLastReview = 0;
+            updateStats();
+            wrongQuestionsList.innerHTML = '';
+            feedbackEl.textContent = '';
+            feedbackEl.className = 'feedback';
+            submitBtn.disabled = false;
+        });
+        
+        submitBtn.addEventListener('click', checkAnswer);
+        answerEl.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+        
+        function generateQuestion() {
+            // 检查是否已完成今日目标
+            if (completedQuestions >= dailyGoal && wrongQuestions.length === 0) {
+                feedbackEl.textContent = '恭喜！你已完成今日练习目标！';
+                feedbackEl.className = 'feedback correct';
+                submitBtn.disabled = true;
+                return;
+            }
+            
+            // 检查是否需要重做错题（每3题后）
+            if (wrongQuestions.length > 0 && questionsSinceLastReview >= 3) {
+                const reviewIndex = Math.floor(Math.random() * wrongQuestions.length);
+                const reviewQuestion = wrongQuestions[reviewIndex];
+                
+                num1 = reviewQuestion.num1;
+                num2 = reviewQuestion.num2;
+                operation = reviewQuestion.operation;
+                correctAnswer = reviewQuestion.correctAnswer;
+                
+                questionEl.textContent = `${num1} ${operation} ${num2} = ?`;
+                questionEl.innerHTML += '<span style="font-size: 0.8em; color: var(--danger-color);"> (错题重做)</span>';
+                answerEl.value = '';
+                feedbackEl.textContent = '';
+                feedbackEl.className = 'feedback';
+                answerEl.focus();
+                
+                questionsSinceLastReview = 0;
+                return;
+            }
+            
+            // 确定可用的运算类型
+            const availableOperations = [];
+            if (addCheckbox.checked) availableOperations.push('+');
+            if (subCheckbox.checked) availableOperations.push('-');
+            if (mulCheckbox.checked) availableOperations.push('×');
+            if (divCheckbox.checked) availableOperations.push('÷');
+            
+            // 随机选择一种运算
+            operation = availableOperations[Math.floor(Math.random() * availableOperations.length)];
+            
+            if (operation === '+') {
+                // 生成加法题
+                num1 = Math.floor(Math.random() * (maxValue - minValue + 1)) + minValue;
+                const maxNum2 = maxValue - num1;
+                num2 = Math.floor(Math.random() * (maxNum2 - minValue + 1)) + minValue;
+                correctAnswer = num1 + num2;
+            } else if (operation === '-') {
+                // 生成减法题
+                num1 = Math.floor(Math.random() * (maxValue - minValue + 1)) + minValue;
+                num2 = Math.floor(Math.random() * (num1 - minValue + 1)) + minValue;
+                correctAnswer = num1 - num2;
+            } else if (operation === '×') {
+                // 生成乘法题
+                num1 = Math.floor(Math.random() * (maxValue - minValue + 1)) + minValue;
+                num2 = Math.floor(Math.random() * (Math.floor(maxValue / num1) - minValue + 1)) + minValue;
+                correctAnswer = num1 * num2;
+            } else {
+                // 生成除法题
+                correctAnswer = Math.floor(Math.random() * (maxValue - minValue + 1)) + minValue;
+                num2 = Math.floor(Math.random() * (maxValue - minValue + 1)) + minValue;
+                // 确保除数不为0
+                if (num2 === 0) num2 = 1;
+                num1 = correctAnswer * num2;
+            }
+            
+            questionEl.textContent = `${num1} ${operation} ${num2} = ?`;
+            answerEl.value = '';
+            feedbackEl.textContent = '';
+            feedbackEl.className = 'feedback';
+            answerEl.focus();
+            
+            questionsSinceLastReview++;
+        }
+        
+        function checkAnswer() {
+            const userAnswer = parseInt(answerEl.value);
+            
+            if (isNaN(userAnswer)) {
+                feedbackEl.textContent = '请输入有效的数字';
+                feedbackEl.className = 'feedback incorrect';
+                return;
+            }
+            
+            totalQuestions++;
+            
+            if (userAnswer === correctAnswer) {
+                correctAnswers++;
+                completedQuestions++;
+                feedbackEl.textContent = '你真棒，算对了！';
+                feedbackEl.className = 'feedback correct';
+                
+                // 更新今日记录
+                todayRecord.completed++;
+                todayRecord.correct++;
+                todayRecord.accuracy = Math.round((todayRecord.correct / todayRecord.completed) * 100);
+                saveRecords();
+                
+                // 如果这是错题重做，从错题列表中移除
+                if (questionEl.textContent.includes('错题重做')) {
+                    removeWrongQuestion(num1, num2, operation);
+                }
+                
+                setTimeout(generateQuestion, 1500);
+            } else {
+                feedbackEl.textContent = '真可惜，算错了，请再想一想';
+                feedbackEl.className = 'feedback incorrect';
+                
+                // 如果不是错题重做，添加到错题列表
+                if (!questionEl.textContent.includes('错题重做')) {
+                    addWrongQuestion(num1, num2, operation, correctAnswer);
+                }
+                
+                answerEl.value = '';
+                answerEl.focus();
+                
+                // 更新今日记录（只计完成，不计正确）
+                todayRecord.completed++;
+                todayRecord.accuracy = Math.round((todayRecord.correct / todayRecord.completed) * 100);
+                saveRecords();
+            }
+            
+            updateStats();
+            dailyGoalDisplay.textContent = `今日目标: ${dailyGoal}题 | 已完成: ${completedQuestions}题`;
+            
+            // 检查是否已完成今日目标
+            if (completedQuestions >= dailyGoal && wrongQuestions.length === 0) {
+                setTimeout(() => {
+                    feedbackEl.textContent = '恭喜！你已完成今日练习目标！';
+                    feedbackEl.className = 'feedback correct';
+                    submitBtn.disabled = true;
+                }, 1500);
+            }
+        }
+        
+        function addWrongQuestion(num1, num2, operation, correctAnswer) {
+            // 检查是否已经存在于错题列表中
+            const exists = wrongQuestions.some(q => 
+                q.num1 === num1 && q.num2 === num2 && q.operation === operation
+            );
+            
+            if (!exists) {
+                wrongQuestions.push({ num1, num2, operation, correctAnswer });
+                updateWrongQuestionsList();
+            }
+        }
+        
+        function removeWrongQuestion(num1, num2, operation) {
+            wrongQuestions = wrongQuestions.filter(q => 
+                !(q.num1 === num1 && q.num2 === num2 && q.operation === operation)
+            );
+            updateWrongQuestionsList();
+        }
+        
+        function updateWrongQuestionsList() {
+            wrongQuestionsList.innerHTML = '';
+            wrongQuestions.forEach((q, index) => {
+                const div = document.createElement('div');
+                div.className = 'wrong-question-item';
+                div.innerHTML = `
+                    <strong>${q.num1} ${q.operation} ${q.num2} = ${q.correctAnswer}</strong>
+                    <div style="font-size: 0.9em; color: #666; margin-top: 5px;">
+                        <i class="fas fa-calendar-alt"></i> ${new Date().toLocaleString()}
+                    </div>
+                `;
+                wrongQuestionsList.appendChild(div);
+            });
+            reviewCountEl.textContent = wrongQuestions.length;
+        }
+        
+        function saveRecords() {
+            localStorage.setItem('trainingRecords', JSON.stringify(trainingRecords));
+            updateRecordsList();
+        }
+        
+        function updateRecordsList() {
+            recordsList.innerHTML = '';
+            trainingRecords.forEach(record => {
+                const div = document.createElement('div');
+                div.className = 'record-item';
+                
+                const dateStr = record.date === today ? 
+                    `<strong>${record.date} (今天)</strong>` : 
+                    record.date;
+                
+                const completionStatus = record.completed >= record.goal ?
+                    '<span style="color: var(--success-color);"><i class="fas fa-check-circle"></i> 已完成</span>' :
+                    '<span style="color: var(--danger-color);"><i class="fas fa-running"></i> 进行中</span>';
+                
+                div.innerHTML = `
+                    <div>
+                        ${dateStr}<br>
+                        <small style="color: #666;">目标: ${record.goal}题</small>
+                    </div>
+                    <div style="text-align: right;">
+                        ${completionStatus}<br>
+                        <small>正确率: ${record.accuracy}%</small>
+                    </div>
+                `;
+                
+                if (record.completed >= record.goal) {
+                    div.classList.add('completed');
+                }
+                
+                recordsList.appendChild(div);
+            });
+        }
+        
+        function updateStats() {
+            totalCountEl.textContent = totalQuestions;
+            correctCountEl.textContent = correctAnswers;
+            const accuracy = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
+            accuracyEl.textContent = accuracy;
+            completedCountEl.textContent = completedQuestions;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>手机补光灯</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'cold-white': 'rgb(24, 140, 252)',
+                        'sweet-sister': 'rgb(255, 188, 204)',
+                        'bright-skin': 'rgb(8, 252, 252)',
+                        'acne-redness': 'rgb(136, 4, 252)',
+                        'water-light': 'rgb(255, 236, 4)',
+                        'natural-light': 'rgb(255, 255, 255)',
+                        'sunset-light': 'rgb(255, 68, 4)',
+                        'ambient': 'rgb(255, 4, 244)',
+                        'blue-gray': 'rgb(161, 175, 201)',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .color-btn {
+                @apply w-[120px] h-[120px] rounded-lg flex items-center justify-center text-black font-medium transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg;
+            }
+            .color-btn.active {
+                @apply ring-4 ring-offset-2 ring-white;
+            }
+            .rgb-slider {
+                @apply w-full h-2 rounded-lg appearance-none cursor-pointer;
+            }
+            .rgb-slider::-webkit-slider-thumb {
+                @apply appearance-none w-5 h-5 rounded-full cursor-pointer;
+            }
+            .rgb-slider.r::-webkit-slider-thumb {
+                @apply bg-red-500;
+            }
+            .rgb-slider.g::-webkit-slider-thumb {
+                @apply bg-green-500;
+            }
+            .rgb-slider.b::-webkit-slider-thumb {
+                @apply bg-blue-500;
+            }
+            .rgb-value {
+                @apply w-12 text-center font-mono;
+            }
+            .mini-rgb-panel {
+                @apply fixed bottom-4 left-1/2 transform -translate-x-1/2 z-20 bg-white/90 backdrop-blur-md shadow-lg rounded-xl p-3 max-w-xs w-full;
+            }
+            /* 新增返回按钮样式 */
+            .back-to-tools {
+                @apply fixed top-4 left-4 z-30 bg-white/90 backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen overflow-hidden font-sans">
+    <!-- 新增返回按钮 -->
+    <a href="ggx2.html" class="back-to-tools" title="返回工具箱">
+        <i class="fa fa-arrow-left text-gray-700"></i>
+    </a>
+
+    <!-- 补光层 -->
+    <div id="lightLayer" class="fixed inset-0 z-0 bg-white/0 pointer-events-none transition-all duration-500"></div>
+
+    <!-- 控制面板 -->
+    <div id="controlPanel" class="fixed inset-0 z-10 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm transition-opacity duration-300">
+        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full">
+            <h2 class="text-xl font-bold text-center mb-6 text-gray-800">选择补光颜色</h2>
+            
+            <div class="grid grid-cols-3 gap-4">
+                <button data-color="cold-white" data-r="24" data-g="140" data-b="252" class="color-btn bg-cold-white">冷白皮</button>
+                <button data-color="sweet-sister" data-r="255" data-g="188" data-b="204" class="color-btn bg-sweet-sister">嫩妹色</button>
+                <button data-color="bright-skin" data-r="8" data-g="252" data-b="252" class="color-btn bg-bright-skin">提亮肤色</button>
+                <button data-color="acne-redness" data-r="136" data-g="4" data-b="252" class="color-btn bg-acne-redness">油痘肌红血丝</button>
+                <button data-color="water-light" data-r="255" data-g="236" data-b="4" class="color-btn bg-water-light">水光肌</button>
+                <button data-color="natural-light" data-r="255" data-g="255" data-b="255" class="color-btn bg-natural-light border border-gray-200">自然光</button>
+                <button data-color="sunset-light" data-r="255" data-g="68" data-b="4" class="color-btn bg-sunset-light">落日灯</button>
+                <button data-color="ambient" data-r="255" data-g="4" data-b="244" class="color-btn bg-ambient">氛围感</button>
+                <button data-color="blue-gray" data-r="161" data-g="175" data-b="201" class="color-btn bg-blue-gray">蓝灰</button>
+            </div>
+            
+            <div id="rgbControls" class="mt-6 hidden">
+                <div class="flex items-center mb-3">
+                    <span class="w-8 text-red-500 font-bold">R:</span>
+                    <input type="range" id="redSlider" min="0" max="255" value="0" class="rgb-slider r bg-red-200">
+                    <span id="redValue" class="rgb-value">0</span>
+                </div>
+                <div class="flex items-center mb-3">
+                    <span class="w-8 text-green-500 font-bold">G:</span>
+                    <input type="range" id="greenSlider" min="0" max="255" value="0" class="rgb-slider g bg-green-200">
+                    <span id="greenValue" class="rgb-value">0</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="w-8 text-blue-500 font-bold">B:</span>
+                    <input type="range" id="blueSlider" min="0" max="255" value="0" class="rgb-slider b bg-blue-200">
+                    <span id="blueValue" class="rgb-value">0</span>
+                </div>
+            </div>
+            
+            <div class="mt-6 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fa fa-lightbulb-o text-yellow-500 text-xl"></i>
+                    <span class="text-gray-700">亮度调节</span>
+                </div>
+                <input type="range" id="brightness" min="0" max="100" value="70" 
+                       class="w-2/3 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500">
+            </div>
+        </div>
+    </div>
+
+    <!-- 返回按钮 -->
+    <button id="backBtn" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/80 text-white flex items-center justify-center shadow-lg transition-all duration-300 opacity-0 z-20 pointer-events-none">
+        <i class="fa fa-chevron-down"></i>
+    </button>
+
+    <!-- 小型RGB控制面板 -->
+    <div id="miniRgbPanel" class="mini-rgb-panel opacity-0 pointer-events-none transition-all duration-300">
+        <div class="flex justify-between items-center mb-2">
+            <h3 class="text-sm font-bold text-gray-800">颜色调节</h3>
+            <button id="closeMiniRgbPanelBtn" class="text-gray-500 hover:text-gray-700 text-sm">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="mb-2">
+            <div class="flex items-center mb-1.5 text-xs">
+                <span class="w-6 text-red-500 font-bold">R:</span>
+                <input type="range" id="miniRedSlider" min="0" max="255" value="0" class="rgb-slider r bg-red-200">
+                <span id="miniRedValue" class="rgb-value text-xs">0</span>
+            </div>
+            <div class="flex items-center mb-1.5 text-xs">
+                <span class="w-6 text-green-500 font-bold">G:</span>
+                <input type="range" id="miniGreenSlider" min="0" max="255" value="0" class="rgb-slider g bg-green-200">
+                <span id="miniGreenValue" class="rgb-value text-xs">0</span>
+            </div>
+            <div class="flex items-center text-xs">
+                <span class="w-6 text-blue-500 font-bold">B:</span>
+                <input type="range" id="miniBlueSlider" min="0" max="255" value="0" class="rgb-slider b bg-blue-200">
+                <span id="miniBlueValue" class="rgb-value text-xs">0</span>
+            </div>
+        </div>
+        
+        <div class="flex justify-between mt-2">
+            <button id="miniResetRgbBtn" class="px-2 py-1 bg-gray-200 rounded-lg text-gray-700 hover:bg-gray-300 transition-colors text-xs">
+                <i class="fa fa-refresh mr-0.5"></i> 重置
+            </button>
+            <button id="miniApplyRgbBtn" class="px-2 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-xs">
+                <i class="fa fa-check mr-0.5"></i> 应用
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const colorButtons = document.querySelectorAll('.color-btn');
+            const lightLayer = document.getElementById('lightLayer');
+            const brightnessSlider = document.getElementById('brightness');
+            const controlPanel = document.getElementById('controlPanel');
+            const backBtn = document.getElementById('backBtn');
+            const rgbControls = document.getElementById('rgbControls');
+            const redSlider = document.getElementById('redSlider');
+            const greenSlider = document.getElementById('greenSlider');
+            const blueSlider = document.getElementById('blueSlider');
+            const redValue = document.getElementById('redValue');
+            const greenValue = document.getElementById('greenValue');
+            const blueValue = document.getElementById('blueValue');
+            const miniRgbPanel = document.getElementById('miniRgbPanel');
+            const miniRedSlider = document.getElementById('miniRedSlider');
+            const miniGreenSlider = document.getElementById('miniGreenSlider');
+            const miniBlueSlider = document.getElementById('miniBlueSlider');
+            const miniRedValue = document.getElementById('miniRedValue');
+            const miniGreenValue = document.getElementById('miniGreenValue');
+            const miniBlueValue = document.getElementById('miniBlueValue');
+            const closeMiniRgbPanelBtn = document.getElementById('closeMiniRgbPanelBtn');
+            const miniResetRgbBtn = document.getElementById('miniResetRgbBtn');
+            const miniApplyRgbBtn = document.getElementById('miniApplyRgbBtn');
+            
+            let selectedColor = null;
+            let brightness = 70;
+            let customR = 0;
+            let customG = 0;
+            let customB = 0;
+            let isCustom = false;
+            let originalRgb = { r: 0, g: 0, b: 0 }; // 存储原始预置色值
+            
+            // 颜色按钮点击事件
+            colorButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // 移除所有按钮的激活状态
+                    colorButtons.forEach(btn => btn.classList.remove('active'));
+                    // 添加当前按钮的激活状态
+                    this.classList.add('active');
+                    // 保存选中的颜色
+                    selectedColor = this.dataset.color;
+                    // 获取RGB值
+                    customR = parseInt(this.dataset.r);
+                    customG = parseInt(this.dataset.g);
+                    customB = parseInt(this.dataset.b);
+                    // 保存原始预置色值
+                    originalRgb = { r: customR, g: customG, b: customB };
+                    // 更新滑块
+                    updateSliderValues();
+                    // 应用灯光效果
+                    applyLightEffect();
+                    // 隐藏控制面板，显示小型RGB面板和返回按钮
+                    setTimeout(() => {
+                        controlPanel.style.opacity = '0';
+                        setTimeout(() => {
+                            controlPanel.style.pointerEvents = 'none';
+                            miniRgbPanel.style.opacity = '1';
+                            miniRgbPanel.style.pointerEvents = 'auto';
+                            backBtn.style.opacity = '1';
+                            backBtn.style.pointerEvents = 'auto';
+                        }, 300);
+                    }, 200);
+                    
+                    isCustom = false;
+                });
+            });
+            
+            // 亮度滑块事件
+            brightnessSlider.addEventListener('input', function() {
+                brightness = parseInt(this.value);
+                applyLightEffect();
+            });
+            
+            // 返回按钮事件
+            backBtn.addEventListener('click', function() {
+                // 显示控制面板
+                controlPanel.style.opacity = '1';
+                controlPanel.style.pointerEvents = 'auto';
+                // 隐藏小型RGB面板和返回按钮
+                miniRgbPanel.style.opacity = '0';
+                miniRgbPanel.style.pointerEvents = 'none';
+                backBtn.style.opacity = '0';
+                backBtn.style.pointerEvents = 'none';
+                // 降低灯光层透明度
+                lightLayer.style.opacity = '0.5';
+            });
+            
+            // RGB滑块事件
+            redSlider.addEventListener('input', function() {
+                customR = parseInt(this.value);
+                redValue.textContent = customR;
+                miniRedSlider.value = customR;
+                miniRedValue.textContent = customR;
+                isCustom = true;
+                applyLightEffect();
+            });
+            
+            greenSlider.addEventListener('input', function() {
+                customG = parseInt(this.value);
+                greenValue.textContent = customG;
+                miniGreenSlider.value = customG;
+                miniGreenValue.textContent = customG;
+                isCustom = true;
+                applyLightEffect();
+            });
+            
+            blueSlider.addEventListener('input', function() {
+                customB = parseInt(this.value);
+                blueValue.textContent = customB;
+                miniBlueSlider.value = customB;
+                miniBlueValue.textContent = customB;
+                isCustom = true;
+                applyLightEffect();
+            });
+            
+            // 小型RGB面板滑块事件
+            miniRedSlider.addEventListener('input', function() {
+                customR = parseInt(this.value);
+                miniRedValue.textContent = customR;
+                redSlider.value = customR;
+                redValue.textContent = customR;
+                isCustom = true;
+                applyLightEffect();
+            });
+            
+            miniGreenSlider.addEventListener('input', function() {
+                customG = parseInt(this.value);
+                miniGreenValue.textContent = customG;
+                greenSlider.value = customG;
+                greenValue.textContent = customG;
+                isCustom = true;
+                applyLightEffect();
+            });
+            
+            miniBlueSlider.addEventListener('input', function() {
+                customB = parseInt(this.value);
+                miniBlueValue.textContent = customB;
+                blueSlider.value = customB;
+                blueValue.textContent = customB;
+                isCustom = true;
+                applyLightEffect();
+            });
+            
+            // 关闭小型RGB面板按钮事件
+            closeMiniRgbPanelBtn.addEventListener('click', function() {
+                miniRgbPanel.style.opacity = '0';
+                miniRgbPanel.style.pointerEvents = 'none';
+                backBtn.style.opacity = '0';
+                backBtn.style.pointerEvents = 'none';
+                // 显示控制面板
+                controlPanel.style.opacity = '1';
+                controlPanel.style.pointerEvents = 'auto';
+            });
+            
+            // 重置RGB按钮事件
+            miniResetRgbBtn.addEventListener('click', function() {
+                if (selectedColor) {
+                    // 恢复到原始预置色值
+                    customR = originalRgb.r;
+                    customG = originalRgb.g;
+                    customB = originalRgb.b;
+                    updateSliderValues();
+                    isCustom = false;
+                    applyLightEffect();
+                }
+            });
+            
+            // 应用RGB按钮事件
+            miniApplyRgbBtn.addEventListener('click', function() {
+                isCustom = true;
+                // 保存当前自定义值作为新的预置值
+                originalRgb = { r: customR, g: customG, b: customB };
+                applyLightEffect();
+            });
+            
+            // 更新滑块值
+            function updateSliderValues() {
+                redSlider.value = customR;
+                greenSlider.value = customG;
+                blueSlider.value = customB;
+                redValue.textContent = customR;
+                greenValue.textContent = customG;
+                blueValue.textContent = customB;
+                
+                miniRedSlider.value = customR;
+                miniGreenSlider.value = customG;
+                miniBlueSlider.value = customB;
+                miniRedValue.textContent = customR;
+                miniGreenValue.textContent = customG;
+                miniBlueValue.textContent = customB;
+            }
+            
+            // 应用灯光效果
+            function applyLightEffect() {
+                let r, g, b;
+                
+                if (isCustom) {
+                    r = customR;
+                    g = customG;
+                    b = customB;
+                } else {
+                    // 从预设颜色中获取RGB值
+                    const colorBtn = document.querySelector(`.color-btn[data-color="${selectedColor}"]`);
+                    if (colorBtn) {
+                        r = parseInt(colorBtn.dataset.r);
+                        g = parseInt(colorBtn.dataset.g);
+                        b = parseInt(colorBtn.dataset.b);
+                    } else {
+                        // 默认白色
+                        r = 255;
+                        g = 255;
+                        b = 255;
+                    }
+                }
+                
+                // 计算透明度 (亮度)
+                const alpha = brightness / 100;
+                
+                // 更新灯光层
+                lightLayer.style.backgroundColor = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+                lightLayer.style.opacity = '1';
+            }
+            
+            // 默认选择第一个颜色
+            if (colorButtons.length > 0) {
+                // 立即取消选择状态，保持初始状态
+                lightLayer.style.opacity = '0';
+                backBtn.style.opacity = '0';
+                backBtn.style.pointerEvents = 'none';
+                controlPanel.style.opacity = '1';
+                controlPanel.style.pointerEvents = 'auto';
+                rgbControls.classList.add('hidden');
+                miniRgbPanel.style.opacity = '0';
+                miniRgbPanel.style.pointerEvents = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

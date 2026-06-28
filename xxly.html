@@ -1,0 +1,225 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学习乐园</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            background-attachment: fixed;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin: 40px 0;
+            animation: fadeIn 1s ease-in-out;
+        }
+        
+        .title {
+            font-size: 2.8rem;
+            color: #333;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            display: inline-block;
+        }
+        
+        .title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, #2196F3, #9C27B0);
+            border-radius: 2px;
+        }
+        
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .learning-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            animation: slideUp 0.8s ease-out;
+        }
+        
+        .learning-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        
+        .card-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .card-content {
+            padding: 25px;
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .card-description {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .card-button {
+            display: inline-block;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #2196F3 0%, #21CBF3 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .math-button {
+            background: linear-gradient(135deg, #2196F3 0%, #21CBF3 100%);
+        }
+        
+        .typing-button {
+            background: linear-gradient(135deg, #FF9800 0%, #FFC107 100%);
+        }
+        
+        .quiz-button {
+            background: linear-gradient(135deg, #9C27B0 0%, #E040FB 100%);
+        }
+        
+        .card-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .back-button {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            padding: 12px 22px;
+            background: linear-gradient(135deg, #666 0%, #888 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 10;
+        }
+        
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            background: linear-gradient(135deg, #555 0%, #777 100%);
+        }
+        
+        .back-button::before {
+            content: '←';
+            font-size: 1.1em;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .card-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .title {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>    
+    <div class="container">
+        <div class="header">
+            <h1 class="title">学习乐园</h1>
+            <p>在这里开启你的知识探索之旅</p>
+        </div>
+        
+        <div class="card-container">
+            <!-- 数学练习卡片 -->
+            <div class="learning-card">
+                <img src="https://images.unsplash.com/photo-1509228627152-72ae9ae6848d?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" alt="数学练习" class="card-image">
+                <div class="card-content">
+                    <h3 class="card-title">数学练习</h3>
+                    <p class="card-description">通过趣味数学题目提升计算能力，包含加减乘除、分数运算等多种题型，适合各年龄段的学习者。</p>
+                    <a href="sxlx.html" class="card-button math-button">开始练习</a>
+                </div>
+            </div>
+            
+            <!-- 打字练习卡片 -->
+            <div class="learning-card">
+                <img src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" alt="打字练习" class="card-image">
+                <div class="card-content">
+                    <h3 class="card-title">打字练习</h3>
+                    <p class="card-description">提高打字速度和准确率，从基础键位练习到文章输入训练，逐步提升你的键盘操作能力。</p>
+                    <a href="dzlx.html" class="card-button typing-button">开始练习</a>
+                </div>
+            </div>
+            
+            <!-- 桂林知识考试卡片 -->
+            <div class="learning-card">
+                <img src="background.jpg" alt="桂林知识考试" class="card-image">
+                <div class="card-content">
+                    <h3 class="card-title">桂林知识在线考试</h3>
+                    <p class="card-description">测试你对桂林的了解程度，包含桂林山水、历史文化、特色美食等多方面知识，快来挑战吧！</p>
+                    <a href="test1.html" class="card-button quiz-button">开始测试</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

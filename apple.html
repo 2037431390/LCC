@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>古诗配对游戏</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4CAF50',
+                        secondary: '#FF9800',
+                        accent: '#F44336',
+                        light: '#F1F8E9',
+                        dark: '#33691E',
+                    },
+                    fontFamily: {
+                        game: ['"Comic Sans MS"', '"Marker Felt"', 'Arial', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            }
+            .apple-hover {
+                transition: transform 0.2s ease;
+            }
+            .apple-hover:hover {
+                transform: scale(1.1);
+                cursor: grab;
+            }
+            .apple-active {
+                cursor: grabbing;
+            }
+            .basket-hover {
+                animation: bounce 0.5s ease infinite alternate;
+            }
+            @keyframes bounce {
+                from { transform: translateY(0); }
+                to { transform: translateY(-10px); }
+            }
+            .tree-container {
+                position: relative;
+                width: 100%;
+                max-width: 600px;
+                height: 500px;
+            }
+            .basket-container {
+                position: absolute;
+                bottom: 20px;
+                left: 10%;
+                width: 100px;
+                height: 100px;
+                z-index: 10;
+            }
+            .apple {
+                position: absolute;
+                width: 60px;
+                height: 60px;
+                cursor: grab;
+                z-index: 20;
+                user-select: none;
+                -webkit-user-select: none;
+            }
+            .apple-word {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: white;
+                font-weight: bold;
+                text-shadow: 1px 1px 2px black;
+                pointer-events: none;
+                font-size: 14px;
+                width: 100%;
+                text-align: center;
+            }
+            .floating-count {
+                position: absolute;
+                font-size: 1.5rem;
+                font-weight: bold;
+                color: #FF5722;
+                z-index: 30;
+                animation: floatUp 1s ease-out forwards;
+            }
+            @keyframes floatUp {
+                0% { opacity: 1; transform: translateY(0); }
+                100% { opacity: 0; transform: translateY(-50px); }
+            }
+            .poem-display {
+                background: rgba(255, 255, 255, 0.8);
+                border-radius: 10px;
+                padding: 10px;
+                margin-bottom: 15px;
+                text-align: center;
+                font-size: 1.2rem;
+                font-weight: bold;
+                border: 2px dashed #4CAF50;
+            }
+            .poem-word {
+                transition: all 0.3s ease;
+                color: #33691E;
+            }
+            .poem-word.collected {
+                color: #FF9800;
+                text-decoration: line-through;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-green-100 to-blue-100 min-h-screen flex flex-col items-center justify-start p-4 md:p-8 font-game">
+    <!-- 返回按钮 -->
+    <a href="yxly.html" class="absolute top-4 left-4 bg-primary hover:bg-dark text-white font-bold py-2 px-4 rounded-full shadow-lg transition-all transform hover:scale-105 z-50">
+        <i class="fa fa-arrow-left mr-2"></i>返回
+    </a>
+
+    <div class="w-full max-w-6xl mx-auto bg-white/80 rounded-2xl shadow-xl p-6 md:p-8 backdrop-blur-sm">
+        <!-- 游戏标题 -->
+        <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold text-center mb-6 text-primary text-shadow">
+            <i class="fa fa-leaf mr-2 text-dark"></i>古诗配对游戏
+        </h1>
+        
+        <!-- 游戏状态 -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-6 bg-light/80 rounded-xl p-4 shadow-inner">
+            <div class="text-lg md:text-xl font-semibold text-dark mb-2 md:mb-0">
+                <i class="fa fa-clock-o mr-2"></i>游戏时间: <span id="timer" class="text-accent">00:00</span>
+            </div>
+            <div class="text-lg md:text-xl font-bold text-dark">
+                已采集词语: <span id="wordCount" class="text-secondary text-2xl">0</span>/<span id="totalWords">0</span>
+                <i class="fa fa-pencil ml-2 text-secondary"></i>
+            </div>
+        </div>
+        
+        <!-- 古诗显示区域 -->
+        <div id="poemContainer" class="poem-display">
+            <!-- 古诗将通过JS动态添加 -->
+        </div>
+        
+        <!-- 游戏区域 -->
+        <div class="flex flex-col items-center justify-center">
+            <div class="tree-container bg-green-50 rounded-2xl shadow-lg overflow-hidden border-4 border-dark/30">
+                <!-- 苹果树 -->
+                <img src="pgsh.png" alt="苹果树" class="w-full h-full object-contain" id="tree">
+                
+                <!-- 篮子 -->
+                <div class="basket-container" id="basket">
+                    <img src="lz.png" alt="篮子" class="w-full h-full object-contain">
+                    <div class="absolute top-0 left-0 w-full h-full flex items-center justify-center text-white font-bold text-2xl text-shadow" id="basketCount">0</div>
+                </div>
+                
+                <!-- 苹果将通过JS动态添加 -->
+            </div>
+            
+            <!-- 游戏说明 -->
+            <div class="mt-6 bg-dark/10 rounded-xl p-4 text-dark/80 max-w-2xl">
+                <h3 class="font-bold text-lg mb-2 text-dark"><i class="fa fa-info-circle mr-2"></i>游戏说明:</h3>
+                <ul class="list-disc pl-6 space-y-1">
+                    <li>根据上方显示的古诗，按顺序采摘苹果上的词语</li>
+                    <li>每成功收集一个正确的词语，分数增加1</li>
+                    <li>按顺序收集完整首诗的词语即可过关</li>
+                    <li>游戏时间有限，请尽快收集</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 游戏结束弹窗 -->
+    <div id="gameOverModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl transform transition-all">
+            <div class="text-center">
+                <div class="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa fa-trophy text-4xl text-primary"></i>
+                </div>
+                <h2 class="text-2xl md:text-3xl font-bold text-dark mb-2" id="gameOverTitle">恭喜您!</h2>
+                <p class="text-lg text-dark/70 mb-6" id="gameOverMessage">您已按顺序收集了所有词语，成功过关!</p>
+                <div class="flex justify-center space-x-4">
+                    <button id="playAgainBtn" class="bg-primary hover:bg-dark text-white font-bold py-3 px-6 rounded-full shadow-lg transition-all transform hover:scale-105">
+                        <i class="fa fa-refresh mr-2"></i>再玩一次
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加音频元素 -->
+    <audio id="collectSound" src="shengli.M4A"></audio>
+    <audio id="wrongSound" src="wrong.M4A"></audio>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 游戏变量
+            const wordCountElement = document.getElementById('wordCount');
+            const totalWordsElement = document.getElementById('totalWords');
+            const basketCountElement = document.getElementById('basketCount');
+            const gameOverModal = document.getElementById('gameOverModal');
+            const gameOverTitle = document.getElementById('gameOverTitle');
+            const gameOverMessage = document.getElementById('gameOverMessage');
+            const playAgainBtn = document.getElementById('playAgainBtn');
+            const timerElement = document.getElementById('timer');
+            const treeContainer = document.querySelector('.tree-container');
+            const basket = document.getElementById('basket');
+            const poemContainer = document.getElementById('poemContainer');
+            const collectSound = document.getElementById('collectSound');
+            const wrongSound = document.getElementById('wrongSound');
+            const treeImg = document.getElementById('tree');
+            
+            let currentWordIndex = 0;
+            let wordCount = 0;
+            let words = [];
+            let isDragging = false;
+            let currentApple = null;
+            let startTime = null;
+            let timerInterval = null;
+            let gameDuration = 120; // 2分钟
+            let currentPoem = '';
+            
+            // 古诗库 - 五言古诗
+            const poems = [
+                "床前明月光，疑是地上霜。",
+                "白日依山尽，黄河入海流。",
+                "春眠不觉晓，处处闻啼鸟。",
+                "红豆生南国，春来发几枝。",
+                "锄禾日当午，汗滴禾下土。",
+                "离离原上草，一岁一枯荣。",
+                "空山不见人，但闻人语响。",
+                "千山鸟飞绝，万径人踪灭。",
+                "江碧鸟逾白，山青花欲燃。",
+                "国破山河在，城春草木深。"
+            ];
+            
+            // 初始化游戏
+            function initGame() {
+                // 重置游戏状态
+                currentWordIndex = 0;
+                wordCount = 0;
+                wordCountElement.textContent = wordCount;
+                basketCountElement.textContent = wordCount;
+                gameOverModal.classList.add('hidden');
+                
+                // 清除篮子里的苹果
+                clearBasketApples();
+                
+                // 清除现有苹果
+                const existingApples = document.querySelectorAll('.apple');
+                existingApples.forEach(apple => apple.remove());
+                
+                // 随机选择一首诗
+                const randomPoemIndex = Math.floor(Math.random() * poems.length);
+                currentPoem = poems[randomPoemIndex];
+                
+                // 显示古诗
+                displayPoem(currentPoem);
+                
+                // 创建苹果
+                createApples(currentPoem);
+                
+                // 开始计时
+                startTimer();
+            }
+            
+            // 显示古诗
+            function displayPoem(poem) {
+                poemContainer.innerHTML = '';
+                
+                // 移除标点符号并分割词语
+                const cleanedPoem = poem.replace(/[，。、；：]/g, '');
+                words = cleanedPoem.split('');
+                totalWordsElement.textContent = words.length;
+                
+                // 创建古诗显示
+                const poemElement = document.createElement('div');
+                
+                // 将诗句分成两部分（五字一句）
+                const firstLine = poem.substring(0, 5);
+                const secondLine = poem.substring(6, 11);
+                
+                // 创建第一行
+                const firstLineElement = document.createElement('div');
+                firstLineElement.className = 'mb-2';
+                
+                // 创建第二行
+                const secondLineElement = document.createElement('div');
+                
+                // 添加词语元素
+                for (let i = 0; i < firstLine.length; i++) {
+                    const wordSpan = document.createElement('span');
+                    wordSpan.className = 'poem-word mx-1';
+                    wordSpan.textContent = firstLine[i];
+                    wordSpan.dataset.index = i;
+                    firstLineElement.appendChild(wordSpan);
+                }
+                
+                for (let i = 0; i < secondLine.length; i++) {
+                    const wordSpan = document.createElement('span');
+                    wordSpan.className = 'poem-word mx-1';
+                    wordSpan.textContent = secondLine[i];
+                    wordSpan.dataset.index = i + 5; // 第二行从索引5开始
+                    secondLineElement.appendChild(wordSpan);
+                }
+                
+                poemElement.appendChild(firstLineElement);
+                poemElement.appendChild(secondLineElement);
+                poemContainer.appendChild(poemElement);
+            }
+            
+            // 清除篮子里的苹果
+            function clearBasketApples() {
+                const smallApples = basket.querySelectorAll('.absolute.w-6');
+                smallApples.forEach(apple => {
+                    apple.style.transition = 'transform 0.3s ease';
+                    apple.style.transform = 'scale(0)';
+                    
+                    setTimeout(() => {
+                        apple.remove();
+                    }, 300);
+                });
+            }
+            
+            // 创建苹果 - 修复苹果位置问题
+            function createApples(poem) {
+                const treeRect = treeContainer.getBoundingClientRect();
+                
+                // 移除标点符号并分割词语
+                const cleanedPoem = poem.replace(/[，。、；：]/g, '');
+                const poemWords = cleanedPoem.split('');
+                
+                // 创建包含原始索引的词语数组
+                const indexedWords = poemWords.map((word, originalIndex) => ({
+                    word,
+                    originalIndex
+                }));
+                
+                // 打乱词语顺序但保留原始索引信息
+                const shuffledWords = [...indexedWords].sort(() => Math.random() - 0.5);
+                
+                // 定义苹果可以出现的区域（树的视觉范围内）
+                const treeArea = {
+                    left: treeContainer.offsetWidth * 0.15,    // 左边距15%
+                    right: treeContainer.offsetWidth * 0.85,  // 右边距15%
+                    top: treeContainer.offsetHeight * 0.1,    // 上边距10%
+                    bottom: treeContainer.offsetHeight * 0.8  // 下边距20%
+                };
+                
+                // 在树上随机位置创建苹果
+                for (let i = 0; i < shuffledWords.length; i++) {
+                    const { word, originalIndex } = shuffledWords[i];
+                    
+                    // 确保苹果出现在树的视觉范围内
+                    const x = Math.floor(Math.random() * (treeArea.right - treeArea.left - 60)) + treeArea.left;
+                    const y = Math.floor(Math.random() * (treeArea.bottom - treeArea.top - 60)) + treeArea.top;
+                    
+                    const apple = document.createElement('div');
+                    apple.className = 'apple apple-hover';
+                    apple.style.left = `${x}px`;
+                    apple.style.top = `${y}px`;
+                    apple.dataset.word = word;
+                    apple.dataset.originalIndex = originalIndex;
+                    
+                    // 添加苹果图片
+                    const appleImg = document.createElement('img');
+                    appleImg.src = 'pg.png';
+                    appleImg.alt = '苹果';
+                    appleImg.className = 'w-full h-full';
+                    apple.appendChild(appleImg);
+                    
+                    // 添加词语
+                    const wordElement = document.createElement('div');
+                    wordElement.className = 'apple-word';
+                    wordElement.textContent = word;
+                    apple.appendChild(wordElement);
+                    
+                    // 添加拖拽事件
+                    apple.addEventListener('mousedown', startDrag);
+                    apple.addEventListener('touchstart', startDrag, { passive: false });
+                    
+                    treeContainer.appendChild(apple);
+                }
+            }
+            
+            // 开始拖拽
+            function startDrag(e) {
+                e.preventDefault();
+                if (isDragging) return;
+                
+                isDragging = true;
+                currentApple = this;
+                currentApple.classList.add('apple-active');
+                currentApple.classList.remove('apple-hover');
+                
+                // 获取初始位置
+                const rect = currentApple.getBoundingClientRect();
+                const treeRect = treeContainer.getBoundingClientRect();
+                
+                const startX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
+                const startY = e.type === 'mousedown' ? e.clientY : e.touches[0].clientY;
+                
+                const appleStartX = rect.left - treeRect.left;
+                const appleStartY = rect.top - treeRect.top;
+                
+                // 移动苹果
+                function moveApple(e) {
+                    if (!isDragging) return;
+                    
+                    const clientX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
+                    const clientY = e.type === 'mousemove' ? e.clientY : e.touches[0].clientY;
+                    
+                    // 计算新位置
+                    const newX = appleStartX + (clientX - startX);
+                    const newY = appleStartY + (clientY - startY);
+                    
+                    // 限制苹果在树容器内
+                    currentApple.style.left = `${Math.max(0, Math.min(newX, treeContainer.offsetWidth - rect.width))}px`;
+                    currentApple.style.top = `${Math.max(0, Math.min(newY, treeContainer.offsetHeight - rect.height))}px`;
+                }
+                
+                // 结束拖拽
+                function endDrag(e) {
+                    if (!isDragging) return;
+                    
+                    isDragging = false;
+                    currentApple.classList.remove('apple-active');
+                    
+                    // 检查是否放入篮子
+                    const appleRect = currentApple.getBoundingClientRect();
+                    const basketRect = document.getElementById('basket').getBoundingClientRect();
+                    
+                    // 计算苹果中心位置
+                    const appleCenterX = appleRect.left + appleRect.width / 2;
+                    const appleCenterY = appleRect.top + appleRect.height / 2;
+                    
+                    // 检查是否在篮子区域内
+                    if (
+                        appleCenterX >= basketRect.left && 
+                        appleCenterX <= basketRect.right && 
+                        appleCenterY >= basketRect.top && 
+                        appleCenterY <= basketRect.bottom
+                    ) {
+                        // 获取苹果上的词语和原始索引
+                        const appleWord = currentApple.dataset.word;
+                        const appleOriginalIndex = parseInt(currentApple.dataset.originalIndex);
+                        
+                        // 检查是否是当前需要收集的词语
+                        if (appleOriginalIndex === currentWordIndex) {
+                            // 更新计数
+                            wordCount++;
+                            currentWordIndex++;
+                            wordCountElement.textContent = wordCount;
+                            basketCountElement.textContent = wordCount;
+                            
+                            // 添加到篮子
+                            collectApple(currentApple);
+                            
+                            // 播放音效
+                            playCollectSound();
+                            
+                            // 添加浮动数字
+                            addFloatingCount(appleCenterX, appleCenterY);
+                            
+                            // 更新古诗显示
+                            updatePoemDisplay(appleOriginalIndex);
+                            
+                            // 检查是否过关
+                            if (wordCount === words.length) {
+                                setTimeout(endGame, 500);
+                            }
+                        } else {
+                            // 播放错误音效
+                            playWrongSound();
+                            
+                            // 显示错误反馈
+                            addFloatingCount(appleCenterX, appleCenterY, "顺序不对");
+                            
+                            // 苹果放回原位
+                            currentApple.style.left = `${parseInt(currentApple.style.left)}px`;
+                            currentApple.style.top = `${parseInt(currentApple.style.top)}px`;
+                            currentApple.classList.add('apple-hover');
+                        }
+                    } else {
+                        // 苹果放回原位
+                        currentApple.style.left = `${parseInt(currentApple.style.left)}px`;
+                        currentApple.style.top = `${parseInt(currentApple.style.top)}px`;
+                        currentApple.classList.add('apple-hover');
+                    }
+                    
+                    // 移除事件监听
+                    document.removeEventListener('mousemove', moveApple);
+                    document.removeEventListener('mouseup', endDrag);
+                    document.removeEventListener('touchmove', moveApple);
+                    document.removeEventListener('touchend', endDrag);
+                }
+                
+                // 添加移动和结束事件监听
+                document.addEventListener('mousemove', moveApple);
+                document.addEventListener('mouseup', endDrag);
+                document.addEventListener('touchmove', moveApple, { passive: false });
+                document.addEventListener('touchend', endDrag);
+            }
+            
+            // 更新古诗显示
+            function updatePoemDisplay(wordIndex) {
+                const wordElements = document.querySelectorAll('.poem-word');
+                wordElements[wordIndex].classList.add('collected');
+            }
+            
+            // 收集苹果
+            function collectApple(apple) {
+                // 创建一个新的小苹果添加到篮子里
+                const basket = document.getElementById('basket');
+                const smallApple = document.createElement('div');
+                smallApple.className = 'absolute w-6 h-6 bg-secondary rounded-full flex items-center justify-center text-white text-xs font-bold';
+                smallApple.textContent = apple.dataset.word;
+                
+                // 随机位置在篮子里
+                const randomX = Math.floor(Math.random() * 60) + 20;
+                const randomY = Math.floor(Math.random() * 60) + 20;
+                
+                smallApple.style.left = `${randomX}px`;
+                smallApple.style.top = `${randomY}px`;
+                smallApple.style.transform = 'scale(0)';
+                smallApple.style.transition = 'transform 0.3s ease';
+                
+                basket.appendChild(smallApple);
+                
+                // 动画显示小苹果
+                setTimeout(() => {
+                    smallApple.style.transform = 'scale(1)';
+                }, 10);
+                
+                // 隐藏原苹果
+                apple.style.opacity = '0';
+                apple.style.pointerEvents = 'none';
+            }
+            
+            // 播放收集音效
+            function playCollectSound() {
+                collectSound.currentTime = 0;
+                collectSound.play();
+                
+                const basket = document.getElementById('basket');
+                basket.classList.add('basket-hover');
+                
+                setTimeout(() => {
+                    basket.classList.remove('basket-hover');
+                }, 300);
+            }
+            
+            // 播放错误音效
+            function playWrongSound() {
+                wrongSound.currentTime = 0;
+                wrongSound.play();
+            }
+            
+            // 添加浮动数字
+            function addFloatingCount(x, y, text = "+1") {
+                const treeRect = treeContainer.getBoundingClientRect();
+                const floatingCount = document.createElement('div');
+                floatingCount.className = 'floating-count';
+                floatingCount.textContent = text;
+                
+                // 转换为相对于树容器的坐标
+                floatingCount.style.left = `${x - treeRect.left}px`;
+                floatingCount.style.top = `${y - treeRect.top}px`;
+                
+                treeContainer.appendChild(floatingCount);
+                
+                // 移除浮动数字
+                setTimeout(() => {
+                    floatingCount.remove();
+                }, 1000);
+            }
+            
+            // 开始计时器
+            function startTimer() {
+                if (timerInterval) clearInterval(timerInterval);
+                
+                startTime = new Date();
+                timerInterval = setInterval(updateTimer, 1000);
+            }
+            
+            // 更新计时器
+            function updateTimer() {
+                const now = new Date();
+                const elapsedSeconds = Math.floor((now - startTime) / 1000);
+                const remainingSeconds = gameDuration - elapsedSeconds;
+                
+                if (remainingSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    if (wordCount === words.length) {
+                        endGame();
+                    } else {
+                        gameOverTitle.textContent = "时间到!";
+                        gameOverMessage.textContent = `您已收集了 ${wordCount} 个词语，还需要 ${words.length - wordCount} 个才能完成古诗。`;
+                        gameOverModal.classList.remove('hidden');
+                    }
+                    return;
+                }
+                
+                const minutes = Math.floor(remainingSeconds / 60);
+                const seconds = remainingSeconds % 60;
+                
+                timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                // 时间不多时显示警告
+                if (remainingSeconds <= 30) {
+                    timerElement.classList.add('text-accent', 'animate-pulse');
+                } else {
+                    timerElement.classList.remove('animate-pulse');
+                }
+            }
+            
+            // 结束游戏
+            function endGame() {
+                clearInterval(timerInterval);
+                
+                // 显示游戏结束弹窗
+                gameOverTitle.textContent = "恭喜您!";
+                gameOverMessage.textContent = `您已按顺序收集了所有词语，成功完成古诗: ${currentPoem}`;
+                gameOverModal.classList.remove('hidden');
+            }
+            
+            // 再玩一次按钮
+            playAgainBtn.addEventListener('click', initGame);
+            
+            // 初始化游戏
+            initGame();
+        });
+    </script>
+</body>
+</html>

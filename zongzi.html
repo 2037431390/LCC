@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>接粽子小游戏</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        #game-container {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            background-color: #e6f7ff;
+            border: 2px solid #333;
+            overflow: hidden;
+        }
+        #difficulty-select {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        #difficulty-select h2 {
+            margin-top: 0;
+        }
+        .difficulty-btn {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .difficulty-btn:hover {
+            filter: brightness(0.9);
+        }
+        #easy-btn { background-color: #4CAF50; color: white; }
+        #medium-btn { background-color: #FFC107; color: #333; }
+        #hard-btn { background-color: #F44336; color: white; }
+        
+        #score-board {
+            position: absolute;
+            top: 10px;
+            left: 80px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        #level-display {
+            position: absolute;
+            top: 10px;
+            right: 120px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        #player {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 100px;
+            background-image: url('ka.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        .zongzi {
+            position: absolute;
+            width: 40px;
+            height: 50px;
+            background-image: url('zz.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        #restart-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            display: none;
+        }
+        #restart-button:hover {
+            background-color: #45a049;
+        }
+        #controls-hint {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            color: #666;
+        }
+        #sound-toggle {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 30px;
+            height: 30px;
+            background-image: url('https://picsum.photos/id/1074/30/30');
+            background-size: cover;
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        }
+        #back-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 8px 15px;
+            font-size: 16px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        #back-button:hover {
+            background-color: #0b7dda;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <a href="yxly.html" id="back-button">返回</a>
+        <div id="difficulty-select">
+            <h2>选择难度</h2>
+            <button id="easy-btn" class="difficulty-btn">简单</button>
+            <button id="medium-btn" class="difficulty-btn">中等</button>
+            <button id="hard-btn" class="difficulty-btn">困难</button>
+        </div>
+        
+        <div id="score-board">接住: 0</div>
+        <div id="level-display">难度: --</div>
+        <button id="restart-button">重新开始</button>
+        <div id="player"></div>
+        <div id="controls-hint">使用键盘方向键或鼠标控制玩偶</div>
+        <div id="sound-toggle"></div>
+    </div>
+
+    <audio id="catch-sound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="drop-sound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-negative-guitar-tone-2334.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="cheer-sound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-cheering-crowd-438.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // 获取游戏元素
+        const gameContainer = document.getElementById('game-container');
+        const player = document.getElementById('player');
+        const scoreBoard = document.getElementById('score-board');
+        const levelDisplay = document.getElementById('level-display');
+        const restartButton = document.getElementById('restart-button');
+        const difficultySelect = document.getElementById('difficulty-select');
+        const easyBtn = document.getElementById('easy-btn');
+        const mediumBtn = document.getElementById('medium-btn');
+        const hardBtn = document.getElementById('hard-btn');
+        const soundToggle = document.getElementById('sound-toggle');
+
+        // 音效元素
+        const catchSound = document.getElementById('catch-sound');
+        const dropSound = document.getElementById('drop-sound');
+        const cheerSound = document.getElementById('cheer-sound');
+
+        // 游戏变量
+        let score = 0;
+        let isGameOver = true;
+        let playerSpeed = 10;
+        let zongziSpeed = 5;
+        let zongziInterval;
+        let zongziElements = [];
+        let useMouseControl = false;
+        let currentDifficulty = null;
+        let soundEnabled = true;
+
+        // 难度设置
+        const difficultySettings = {
+            easy: { speed: 3, name: '简单' },
+            medium: { speed: 5, name: '中等' },
+            hard: { speed: 8, name: '困难' }
+        };
+
+        // 播放音效函数
+        function playSound(sound) {
+            if (!soundEnabled) return;
+            
+            sound.pause();
+            sound.currentTime = 0;
+            
+            // 尝试播放音效，处理可能的自动播放限制
+            sound.play().catch(e => {
+                console.log("播放音效失败:", e);
+                // 如果因自动播放策略失败，可以提示用户点击
+                if (e.name === 'NotAllowedError') {
+                    soundToggle.style.opacity = '0.3';
+                    setTimeout(() => soundToggle.style.opacity = '1', 500);
+                }
+            });
+        }
+
+        // 玩家控制
+        let keys = {
+            ArrowLeft: false,
+            ArrowRight: false
+        };
+        
+        // 键盘控制
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                e.preventDefault();
+                keys[e.key] = true;
+                useMouseControl = false;
+            }
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                keys[e.key] = false;
+            }
+        });
+
+        // 鼠标控制
+        gameContainer.addEventListener('mousemove', (e) => {
+            if (isGameOver) return;
+            
+            const containerRect = gameContainer.getBoundingClientRect();
+            const mouseX = e.clientX - containerRect.left;
+            const playerWidth = player.offsetWidth;
+            const maxLeft = containerRect.width - playerWidth;
+            
+            let newLeft = Math.max(0, Math.min(maxLeft, mouseX - playerWidth/2));
+            
+            player.style.left = newLeft + 'px';
+            useMouseControl = true;
+        });
+
+        // 移动玩家
+        function movePlayer() {
+            if (useMouseControl || isGameOver) return;
+            
+            const containerWidth = gameContainer.offsetWidth;
+            const playerWidth = player.offsetWidth;
+            let playerLeft = parseInt(player.style.left) || (containerWidth - playerWidth) / 2;
+
+            if (keys.ArrowLeft && playerLeft > 0) {
+                playerLeft -= playerSpeed;
+            }
+            if (keys.ArrowRight && playerLeft < containerWidth - playerWidth) {
+                playerLeft += playerSpeed;
+            }
+
+            player.style.left = playerLeft + 'px';
+        }
+
+        // 创建粽子
+        function createZongzi() {
+            if (isGameOver) return;
+
+            const containerWidth = gameContainer.offsetWidth;
+            const zongziWidth = 40;
+            const zongziLeft = Math.random() * (containerWidth - zongziWidth);
+
+            const zongzi = document.createElement('div');
+            zongzi.className = 'zongzi';
+            zongzi.style.left = zongziLeft + 'px';
+            zongzi.style.top = '0px';
+            gameContainer.appendChild(zongzi);
+            zongziElements.push(zongzi);
+        }
+
+        // 移动粽子
+        function moveZongzi() {
+            if (isGameOver) return;
+            
+            const containerHeight = gameContainer.offsetHeight;
+            const playerHeight = player.offsetHeight;
+            const playerTop = containerHeight - playerHeight - 20;
+
+            for (let i = zongziElements.length - 1; i >= 0; i--) {
+                const zongzi = zongziElements[i];
+                let zongziTop = parseInt(zongzi.style.top) || 0;
+                zongziTop += zongziSpeed;
+                zongzi.style.top = zongziTop + 'px';
+
+                // 检测是否接到粽子
+                if (isColliding(zongzi, player)) {
+                    gameContainer.removeChild(zongzi);
+                    zongziElements.splice(i, 1);
+                    score++;
+                    scoreBoard.textContent = `接住: ${score}`;
+                    playSound(catchSound); // 播放接住音效（欢快）
+
+                    // 检查是否达到目标分数
+                    if (score >= 10) {
+                        gameOver(true);
+                    }
+                } 
+                // 检测是否粽子落地
+                else if (zongziTop > containerHeight) {
+                    gameContainer.removeChild(zongzi);
+                    zongziElements.splice(i, 1);
+                    playSound(dropSound); // 播放落地音效（失误）
+                }
+            }
+        }
+
+        // 碰撞检测
+        function isColliding(element1, element2) {
+            const rect1 = element1.getBoundingClientRect();
+            const rect2 = element2.getBoundingClientRect();
+
+            return (
+                rect1.left < rect2.right &&
+                rect1.right > rect2.left &&
+                rect1.bottom > rect2.top &&
+                rect1.top < rect2.bottom
+            );
+        }
+
+        // 设置难度
+        function setDifficulty(difficulty) {
+            currentDifficulty = difficulty;
+            zongziSpeed = difficultySettings[difficulty].speed;
+            levelDisplay.textContent = `难度: ${difficultySettings[difficulty].name}`;
+            difficultySelect.style.display = 'none';
+            isGameOver = false;
+            
+            // 开始生成粽子
+            zongziInterval = setInterval(createZongzi, 1000);
+        }
+
+        // 游戏结束
+        function gameOver(isWin) {
+            isGameOver = true;
+            clearInterval(zongziInterval);
+            
+            if (isWin) {
+                setTimeout(() => {
+                    playSound(cheerSound); // 播放欢呼声
+                    alert(`恭喜你在${difficultySettings[currentDifficulty].name}难度下成功接住了10个粽子！`);
+                    restartButton.style.display = 'block';
+                }, 100);
+            }
+        }
+
+        // 重新开始游戏
+        function restartGame() {
+            // 移除所有粽子
+            for (let zongzi of zongziElements) {
+                if (gameContainer.contains(zongzi)) {
+                    gameContainer.removeChild(zongzi);
+                }
+            }
+            zongziElements = [];
+
+            // 重置游戏状态
+            score = 0;
+            scoreBoard.textContent = `接住: ${score}`;
+            isGameOver = true;
+            restartButton.style.display = 'none';
+            useMouseControl = false;
+
+            // 重置玩家位置
+            player.style.left = ((gameContainer.offsetWidth - player.offsetWidth) / 2) + 'px';
+
+            // 显示难度选择
+            difficultySelect.style.display = 'block';
+        }
+
+        // 切换音效
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            soundToggle.style.opacity = soundEnabled ? '1' : '0.5';
+        }
+
+        // 游戏循环
+        function gameLoop() {
+            movePlayer();
+            moveZongzi();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // 事件监听
+        easyBtn.addEventListener('click', () => setDifficulty('easy'));
+        mediumBtn.addEventListener('click', () => setDifficulty('medium'));
+        hardBtn.addEventListener('click', () => setDifficulty('hard'));
+        restartButton.addEventListener('click', restartGame);
+        soundToggle.addEventListener('click', toggleSound);
+        
+        // 点击游戏容器时聚焦
+        gameContainer.addEventListener('click', () => {
+            if (!isGameOver) gameContainer.focus();
+        });
+
+        // 初始化声音权限（需要用户交互）
+        gameContainer.addEventListener('click', function initSound() {
+            if (soundEnabled) {
+                // 尝试播放无声音频来解除自动播放限制
+                const silent = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=');
+                silent.play().then(() => {
+                    gameContainer.removeEventListener('click', initSound);
+                    console.log('声音权限已初始化');
+                }).catch(e => console.log('声音初始化失败:', e));
+            }
+        }, { once: true });
+
+        // 开始游戏 - 显示难度选择
+        gameLoop();
+    </script>
+</body>
+</html>

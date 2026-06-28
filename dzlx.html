@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>打字练习导航</title>
+    <style>
+        body {
+            font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* 返回按钮样式 */
+        .back-button {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            padding: 12px 20px 12px 15px;
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+        }
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(108, 92, 231, 0.4);
+            background: linear-gradient(135deg, #5d4aec 0%, #9489f4 100%);
+        }
+        .back-button:active {
+            transform: translateY(1px);
+        }
+        .back-button::before {
+            content: '';
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            transition: transform 0.3s;
+        }
+        .back-button:hover::before {
+            transform: translateX(-3px);
+        }
+
+        /* 容器样式 */
+        .container {
+            text-align: center;
+            max-width: 800px;
+            width: 90%;
+            background-color: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            margin-top: 30px;
+        }
+        .container::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, #6c5ce7, #00cec9);
+        }
+
+        /* 标题样式 */
+        h1 {
+            color: #2d3436;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+            position: relative;
+        }
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #6c5ce7, #00cec9);
+            border-radius: 3px;
+        }
+
+        /* 按钮容器样式 */
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+        }
+
+        /* 导航按钮样式 */
+        .nav-button {
+            background: linear-gradient(135deg, #FF9800 0%, #FFC107 100%);
+            color: white;
+            border: none;
+            padding: 18px 35px;
+            font-size: 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            min-width: 180px;
+            text-decoration: none;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 6px 12px rgba(255, 152, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .nav-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(255, 152, 0, 0.3);
+            background: linear-gradient(135deg, #F57C00 0%, #FFA000 100%);
+        }
+        .nav-button:active {
+            transform: translateY(2px);
+        }
+        
+        /* 按钮图标样式 */
+        .button-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 600px) {
+            body {
+                padding: 15px;
+            }
+            .back-button {
+                top: 15px;
+                left: 15px;
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            .container {
+                padding: 30px 20px;
+                margin-top: 60px;
+            }
+            h1 {
+                font-size: 2em;
+                margin-bottom: 30px;
+            }
+            .button-container {
+                gap: 15px;
+            }
+            .nav-button {
+                width: 100%;
+                padding: 15px 25px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 返回按钮 -->
+    <a href="xxly.html" class="back-button">返回学习乐园</a>
+
+    <div class="container">
+        <h1>打字练习</h1>
+        <div class="button-container">
+            <a href="class1.html" class="nav-button">
+                <span class="button-icon">🔤</span>英文字母
+            </a>
+            <a href="class2.html" class="nav-button">
+                <span class="button-icon">📚</span>中学单词
+            </a>
+            <a href="class3.html" class="nav-button">
+                <span class="button-icon">🎓</span>英语四级
+            </a>
+            <a href="class4.html" class="nav-button">
+                <span class="button-icon">🍜</span>桂林美食
+            </a>
+        </div>
+    </div>
+</body>
+</html>

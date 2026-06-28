@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>逃脱成功！</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            background-color: #121212;
+            color: white;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .success-container {
+            position: relative;
+            z-index: 10;
+            max-width: 90%;
+            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .image-wrapper {
+            position: relative;
+            margin-bottom: 30px;
+        }
+        
+        .success-image {
+            max-width: 100%;
+            height: auto;
+            border: 4px solid #4CAF50;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.6);
+        }
+        
+        .success-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        h1 {
+            color: #4CAF50;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-shadow: 0 0 8px rgba(76, 175, 80, 0.7);
+            width: 100%;
+        }
+        
+        .congrats-line {
+            font-size: 2.5rem;
+            color: #4CAF50;
+            text-shadow: 0 0 8px rgba(76, 175, 80, 0.7);
+            margin-bottom: 30px;
+            width: 100%;
+            white-space: nowrap;
+        }
+        
+        .restart-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 30px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            font-size: 1.2rem;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .restart-button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* 新增返回按钮样式 */
+        .back-button {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            padding: 10px 20px;
+            background-color: rgba(76, 175, 80, 0.3);
+            color: white;
+            border: 2px solid #4CAF50;
+            border-radius: 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .back-button:hover {
+            background-color: rgba(76, 175, 80, 0.5);
+            transform: translateX(-5px);
+        }
+        
+        .back-button::before {
+            content: "←";
+            margin-right: 8px;
+            font-size: 1.2em;
+        }
+        
+        /* 彩色纸屑效果 - 修改为从顶部掉落 */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            opacity: 0.8;
+            animation: fall linear forwards;
+            z-index: 11; /* 修改 z-index 为大于 10 的值 */
+            top: -10px; /* 从屏幕顶部开始 */
+        }
+        
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            h1, .congrats-line {
+                font-size: 2rem;
+                margin-bottom: 20px;
+            }
+            
+            .restart-button {
+                padding: 10px 25px;
+                font-size: 1rem;
+            }
+            
+            .back-button {
+                top: 20px;
+                left: 20px;
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1, .congrats-line {
+                font-size: 1.5rem;
+                white-space: normal;
+            }
+            
+            .back-button {
+                top: 15px;
+                left: 15px;
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 新增返回按钮 -->
+    <button class="back-button" onclick="window.location.href='yxly.html'">返回</button>
+    
+    <div class="success-container">
+        <div class="image-wrapper">
+            <img src="meng.html.png" alt="逃脱成功" class="success-image">
+            <div class="success-text">
+                <h1>恭喜你成功逃脱！</h1>
+                <div class="congrats-line">你以惊人的智慧和勇气解开了所有谜题！</div>
+                <a href="room1.html" class="restart-button">重新开始游戏</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 创建彩色纸屑效果 - 修改为从顶部掉落
+        function createConfetti() {
+            const colors = ['#f44336', '#4CAF50', '#2196F3', '#FFEB3B', '#9C27B0', '#00BCD4'];
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            
+            // 随机属性
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.width = (Math.random() * 12 + 5) + 'px';
+            confetti.style.height = confetti.style.width;
+            confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            confetti.style.opacity = Math.random() * 0.5 + 0.5;
+            confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+            
+            // 设置初始位置在屏幕顶部
+            confetti.style.top = '-10px';
+            
+            document.body.appendChild(confetti);
+            
+            // 动画结束后移除元素
+            setTimeout(() => {
+                confetti.remove();
+            }, 5000);
+        }
+        
+        // 持续生成彩色纸屑
+        setInterval(createConfetti, 100);
+        
+        // 初始生成一批纸屑
+        for (let i = 0; i < 50; i++) {
+            setTimeout(createConfetti, i * 100);
+        }
+    </script>
+</body>
+</html>

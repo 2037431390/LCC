@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线考试 - 填空题</title>
+    <style>
+        body {
+            font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            position: relative;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .back-button {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            padding: 12px 20px 12px 15px;
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            border: none;
+            outline: none;
+            font-size: 16px;
+        }
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(108, 92, 231, 0.4);
+            background: linear-gradient(135deg, #5d4aec 0%, #9489f4 100%);
+        }
+        .back-button:active {
+            transform: translateY(1px);
+        }
+        .back-button::before {
+            content: '';
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            transition: transform 0.3s;
+        }
+        .back-button:hover::before {
+            transform: translateX(-3px);
+        }
+        .question-container {
+            font-size: 24px;
+            margin: 40px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            color: #2d3436;
+            font-weight: bold;
+            text-align: center;
+        }
+        .question-text {
+            margin: 0 8px;
+        }
+        .answer-input {
+            width: 5em;
+            height: 1.8em;
+            font-size: 24px;
+            text-align: center;
+            margin: 0 8px;
+            padding: 8px 12px;
+            border: 2px solid #dfe6e9;
+            border-radius: 10px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        .answer-input:focus {
+            border-color: #6c5ce7;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+        }
+        .submit-btn {
+            background: linear-gradient(135deg, #00b894 0%, #55efc4 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 18px;
+            margin-top: 30px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0, 184, 148, 0.3);
+        }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 184, 148, 0.4);
+            background: linear-gradient(135deg, #00a884 0%, #4ad4b4 100%);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 85%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: modalFadeIn 0.4s ease-out;
+        }
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .next-btn {
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 25px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3);
+        }
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(108, 92, 231, 0.4);
+            background: linear-gradient(135deg, #5d4aec 0%, #9489f4 100%);
+        }
+        #resultText {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        .score-display {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            font-size: 16px;
+            font-weight: bold;
+            color: #2d3436;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+        }
+        .score-display::before {
+            content: '🏆';
+            margin-right: 8px;
+            font-size: 18px;
+        }
+        #scoreDisplay {
+            color: #6c5ce7;
+            font-weight: bold;
+            margin: 0 5px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 600px) {
+            body {
+                padding: 15px;
+            }
+            .back-button, .score-display {
+                top: 15px;
+                left: 15px;
+                right: 15px;
+                padding: 10px 15px;
+            }
+            .question-container {
+                font-size: 20px;
+                margin-top: 50px;
+            }
+            .answer-input {
+                width: 4em;
+                font-size: 20px;
+                margin: 8px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 返回按钮 -->
+    <a href="xxly.html" class="back-button">返回学习乐园</a>
+
+    <!-- 分数显示 -->
+    <div class="score-display">
+        得分: <span id="scoreDisplay">0</span>/4
+    </div>
+
+    <div class="question-container">
+        <span class="question-text">象鼻山在桂林的</span>
+        <input type="text" id="answerInput" class="answer-input" maxlength="2">
+        <span class="question-text">区。</span>
+    </div>
+    
+    <button id="submitBtn" class="submit-btn">提交</button>
+
+    <!-- 弹窗 -->
+    <div id="resultModal" class="modal">
+        <div class="modal-content">
+            <p id="resultText"></p>
+            <button id="nextBtn" class="next-btn" style="display: none;">查看结果</button>
+        </div>
+    </div>
+
+    <script>
+        // 获取DOM元素
+        const answerInput = document.getElementById('answerInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const modal = document.getElementById('resultModal');
+        const resultText = document.getElementById('resultText');
+        const nextBtn = document.getElementById('nextBtn');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        
+        // 初始化分数
+        function initScore() {
+            if (!localStorage.getItem('quizScore')) {
+                localStorage.setItem('quizScore', '0');
+            }
+            scoreDisplay.textContent = localStorage.getItem('quizScore');
+        }
+        
+        // 提交按钮点击事件
+        submitBtn.addEventListener('click', function() {
+            const userAnswer = answerInput.value.trim();
+            
+            // 检查答案
+            if (userAnswer === "象山") {
+                resultText.textContent = "🎉 你真棒，答对了！";
+                nextBtn.style.display = "inline-block";
+                
+                // 如果之前没答对过这道题，增加分数
+                if (!localStorage.getItem('q4Answered')) {
+                    const currentScore = parseInt(localStorage.getItem('quizScore'));
+                    localStorage.setItem('quizScore', (currentScore + 1).toString());
+                    scoreDisplay.textContent = currentScore + 1;
+                    localStorage.setItem('q4Answered', 'true');
+                }
+            } else {
+                resultText.textContent = "😅 正确答案是：象山，请继续努力！";
+                nextBtn.style.display = "none";
+            }
+            
+            modal.style.display = "block";
+        });
+        
+        // 下一题按钮事件
+        nextBtn.addEventListener('click', function() {
+            // 跳转到结果页面并传递总分
+            window.location.href = "success.html?score=" + localStorage.getItem('quizScore');
+        });
+        
+        // 点击模态框外部关闭模态框
+        window.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        });
+        
+        // 输入框回车键提交
+        answerInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                submitBtn.click();
+            }
+        });
+        
+        // 页面加载时初始化
+        window.onload = initScore;
+    </script>
+</body>
+</html>

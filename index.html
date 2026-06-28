@@ -1,0 +1,437 @@
+
+
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LC的个人网站</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body,
+        html {
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+
+        .header {
+            display: flex;
+            flex-direction: column;
+            height: 120px;
+        }
+
+        .logo-bar {
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            height: 60px;
+            background-color: #ADD8E6;
+            /* 浅蓝色背景 */
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            margin-right: 15px;
+        }
+
+        .site-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .nav-bar {
+            display: flex;
+            height: 60px;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            font-size: 16px; /* 导航栏按钮字号 */
+        }
+
+        .nav-item:hover {
+            filter: brightness(1.1);
+        }
+
+        .home {
+            background-color: #CCCCFF;
+            color: black;
+        }
+
+        .tools {
+            background-color: #CCCC99;
+            color: white;
+        }
+
+        .games {
+            background-color: #666633;
+            color: white;
+        }
+
+        .study {
+            background-color: #993366;
+            color: white;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 120px);
+            background-color: #FFFFFF;
+            color: black;
+            text-align: center;
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .content h2 {
+            margin-bottom: 20px;
+        }
+
+        .content p {
+            max-width: 800px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: center; /* 确保所有段落居中 */
+        }
+
+        .portfolio-section {
+            margin-bottom: 40px;
+        }
+
+        .portfolio-section h3 {
+            margin-bottom: 10px;
+        }
+
+        .video-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .video-gallery video {
+            width: 300px;
+            height: auto;
+            margin: 10px;
+        }
+
+        .photo-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .photo-gallery img {
+            width: 300px;
+            height: auto;
+            margin: 10px;
+        }
+
+        /* 游戏乐园样式 */
+       .games-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+       .game-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+       .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+        }
+
+       .game-thumbnail {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+       .game-info {
+            padding: 20px;
+        }
+
+       .game-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+       .game-description {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+       .play-button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #666633;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+       .play-button:hover {
+            background-color: #777744;
+        }
+
+       .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* 工具箱样式 */
+       .tools-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+       .tool-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+       .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+        }
+
+       .tool-thumbnail {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+       .tool-info {
+            padding: 20px;
+        }
+
+       .tool-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+       .tool-description {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+       .use-button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #CCCC99;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+       .use-button:hover {
+            background-color: #ddddaa;
+        }
+
+        /* 返回首页按钮样式 - 左上角 */
+       .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #CCCC99;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px; /* 与导航栏按钮字号一致 */
+            font-weight: bold; /* 与导航栏按钮字体粗细一致 */
+            transition: background-color 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+       .back-button:hover {
+            background-color: #ddddaa;
+        }
+
+        /* 初始隐藏游戏乐园和工具箱内容 */
+       #game-content,
+       #tool-content {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="logo-bar">
+            <img src="xg.png" alt="网站logo" class="logo">
+            <div class="site-title">LC的个人网站</div>
+        </div>
+        <div class="nav-bar">
+            <a href="#" class="nav-item home" onclick="showHome()">个人首页</a>
+            <a href="tools/ggx2.html" class="nav-item tools" onclick="showTools()">工具箱</a>
+            <a href="games/yxly.html" class="nav-item games" onclick="showGames()">游戏乐园</a>
+            <a href="tools/xxly.html" class="nav-item study">学习乐园</a>
+        </div>
+    </div>
+    <div class="content" id="home-content">
+        <div>
+            <h2>欢迎来到我的网站</h2>
+                   </div>
+        <div class="portfolio-section">
+            <h3>摄影作品集</h3>
+            <div class="photo-gallery">
+                <img src="hua.jpg" alt="示例摄影作品">
+                <img src="sg.jpg" alt="示例摄影作品">
+                <img src="dl.jpg" alt="示例摄影作品">
+            </div>
+        </div>
+    </div>
+    <div class="content" id="game-content">
+        <a href="#" class="back-button" onclick="showHome()">
+        </a>
+        <main class="games-container">
+            <div class="game-card">
+                <img src="https://picsum.photos/seed/snake/600/400" alt="贪吃蛇游戏" class="game-thumbnail">
+                <div class="game-info">
+                    <h3 class="game-title">贪吃蛇</h3>
+                    <p class="game-description">经典的贪吃蛇游戏，控制蛇移动并吃掉食物，注意不要撞到墙壁或自己的身体！</p>
+                    <a href="snake.html" class="play-button">开始游戏</a>
+                </div>
+            </div>
+
+            <div class="game-card">
+                <img src="https://picsum.photos/seed/attention/600/400" alt="专注力游戏" class="game-thumbnail">
+                <div class="game-info">
+                    <h3 class="game-title">专注力游戏</h3>
+                    <p class="game-description">测试你的注意力和反应能力，点击出现的目标，挑战你的极限！</p>
+                    <a href="zzll.html" class="play-button">开始游戏</a>
+                </div>
+            </div>
+
+            <div class="game-card">
+                <img src="https://picsum.photos/seed/stone/600/400" alt="摆石头游戏" class="game-thumbnail">
+                <div class="game-info">
+                    <h3 class="game-title">摆石头</h3>
+                    <p class="game-description">策略性的摆石头游戏，思考如何放置石头以获得最高分。</p>
+                    <a href="movestones.html" class="play-button">开始游戏</a>
+                </div>
+            </div>
+
+            <div class="game-card">
+                <img src="https://picsum.photos/seed/apple/600/400" alt="采集苹果游戏" class="game-thumbnail">
+                <div class="game-info">
+                    <h3 class="game-title">采集苹果</h3>
+                    <p class="game-description">帮助果农收集掉落的苹果，不要让它们掉到地上！</p>
+                    <a href="apple.html" class="play-button">开始游戏</a>
+                </div>
+            </div>
+
+            <div class="game-card">
+                <img src="https://picsum.photos/seed/zongzi/600/400" alt="接粽子游戏" class="game-thumbnail">
+                <div class="game-info">
+                    <h3 class="game-title">接粽子</h3>
+                    <p class="game-description">传统节日游戏，控制容器接住掉落的粽子，体验节日氛围！</p>
+                    <a href="zongzi.html" class="play-button">开始游戏</a>
+                </div>
+            </div>
+        </main>
+        <footer class="footer">
+            <p>© 2025 LC的个人网站 | 游戏乐园</p>
+        </footer>
+    </div>
+    <div class="content" id="tool-content">
+        <a href="#" class="back-button" onclick="showHome()">
+            <span>返回首页</span>
+        </a>
+        <main class="tools-container">
+            <!-- 补光灯工具 -->
+            <div class="tool-card">
+                <!-- 更换补光灯工具的图片 -->
+                <img src="dl.jpg" alt="补光灯工具" class="tool-thumbnail">
+                <div class="tool-info">
+                    <h3 class="tool-title">补光灯</h3>
+                    <p class="tool-description">增强图片亮度，改善光线不足的情况，让图片更加清晰。</p>
+                    <a href="pgd.html" class="use-button">使用工具</a>
+                </div>
+            </div>
+
+            <!-- 缩放图片工具 -->
+            <div class="tool-card">
+                <img src="https://picsum.photos/seed/zoom/600/400" alt="缩放图片工具" class="tool-thumbnail">
+                <div class="tool-info">
+                    <h3 class="tool-title">缩放图片</h3>
+                    <p class="tool-description">调整图片尺寸，支持按比例缩放或自定义尺寸，方便分享和使用。</p>
+                    <a href="zpsf.html" class="use-button">使用工具</a>
+                </div>
+            </div>
+
+            <!-- 可以在这里添加更多工具... -->
+        </main>
+        <footer class="footer">
+            <p>© 2025 LC的个人网站 | 工具箱</p>
+        </footer>
+    </div>
+
+    <script>
+        function showHome() {
+            document.getElementById('home-content').style.display = 'flex';
+            document.getElementById('game-content').style.display = 'none';
+            document.getElementById('tool-content').style.display = 'none';
+        }
+
+        function showGames() {
+            document.getElementById('home-content').style.display = 'none';
+            document.getElementById('game-content').style.display = 'flex';
+            document.getElementById('tool-content').style.display = 'none';
+        }
+
+        function showTools() {
+            document.getElementById('home-content').style.display = 'none';
+            document.getElementById('game-content').style.display = 'none';
+            document.getElementById('tool-content').style.display = 'flex';
+        }
+    </script>
+</body>
+
+</html>

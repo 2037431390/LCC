@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>考试结果</title>
+    <style>
+        body {
+            font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+        }
+        .back-button {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            padding: 12px 20px 12px 15px;
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            border: none;
+            outline: none;
+            font-size: 16px;
+        }
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(108, 92, 231, 0.4);
+            background: linear-gradient(135deg, #5d4aec 0%, #9489f4 100%);
+        }
+        .back-button:active {
+            transform: translateY(1px);
+        }
+        .back-button::before {
+            content: '';
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            transition: transform 0.3s;
+        }
+        .back-button:hover::before {
+            transform: translateX(-3px);
+        }
+        .result-container {
+            background-color: white;
+            padding: 50px 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            max-width: 600px;
+            width: 90%;
+            position: relative;
+            overflow: hidden;
+        }
+        .result-container::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #6c5ce7, #00cec9);
+        }
+        h1 {
+            color: #2d3436;
+            margin-bottom: 30px;
+            font-size: 28px;
+            position: relative;
+        }
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #6c5ce7, #00cec9);
+            border-radius: 3px;
+        }
+        .score-display {
+            font-size: 28px;
+            margin: 30px 0;
+            font-weight: bold;
+            color: #2d3436;
+        }
+        #finalScore {
+            color: #6c5ce7;
+            font-size: 36px;
+        }
+        .message {
+            font-size: 20px;
+            margin: 30px 0;
+            font-weight: bold;
+        }
+        .restart-btn {
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 18px;
+            margin-top: 20px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
+        }
+        .restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(108, 92, 231, 0.4);
+            background: linear-gradient(135deg, #5d4aec 0%, #9489f4 100%);
+        }
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            border-radius: 50%;
+            animation: confettiFall 5s linear infinite;
+        }
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 600px) {
+            body {
+                padding: 15px;
+            }
+            .back-button {
+                top: 15px;
+                left: 15px;
+                padding: 10px 15px;
+            }
+            .result-container {
+                padding: 30px 20px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            .score-display {
+                font-size: 24px;
+            }
+            #finalScore {
+                font-size: 30px;
+            }
+            .message {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 返回按钮 -->
+    <a href="xxly.html" class="back-button">返回学习乐园</a>
+
+    <div class="result-container">
+        <h1>考试完成</h1>
+        <div class="score-display">你的总分是: <span id="finalScore">0</span>/4</div>
+        <div class="message" id="resultMessage"></div>
+    </div>
+    
+    <button class="restart-btn" id="restartBtn">重新开始</button>
+
+    <script>
+        // 获取URL参数中的分数
+        const urlParams = new URLSearchParams(window.location.search);
+        const score = urlParams.get('score') || 0;
+        
+        // 显示分数
+        document.getElementById('finalScore').textContent = score;
+        
+        // 根据分数显示不同的消息
+        const resultMessage = document.getElementById('resultMessage');
+        if (score >= 4) {
+            resultMessage.textContent = "🎉 太棒了！你全部答对了！";
+            resultMessage.style.color = "#00b894";
+            createConfetti();
+        } else if (score >= 2) {
+            resultMessage.textContent = "👍 不错！再接再厉！";
+            resultMessage.style.color = "#f39c12";
+        } else {
+            resultMessage.textContent = "💪 继续努力，你可以做得更好！";
+            resultMessage.style.color = "#e74c3c";
+        }
+        
+        // 创建彩色纸屑效果
+        function createConfetti() {
+            const colors = ['#6c5ce7', '#00b894', '#fdcb6e', '#e17055', '#0984e3', '#00cec9'];
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                confetti.style.animationDelay = Math.random() + 's';
+                document.body.appendChild(confetti);
+            }
+        }
+        
+        // 重新开始按钮事件
+        document.getElementById('restartBtn').addEventListener('click', function() {
+            // 清除所有存储的数据
+            localStorage.removeItem('quizScore');
+            localStorage.removeItem('q1Answered');
+            localStorage.removeItem('q2Answered');
+            localStorage.removeItem('q3Answered');
+            localStorage.removeItem('q4Answered');
+            
+            // 返回第一题
+            window.location.href = "test1.html";
+        });
+    </script>
+</body>
+</html>

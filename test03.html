@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线考试 - 拖曳题</title>
+    <style>
+        body {
+            font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            position: relative;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .back-button {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            padding: 12px 20px 12px 15px;
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            border: none;
+            outline: none;
+            font-size: 16px;
+        }
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(108, 92, 231, 0.4);
+            background: linear-gradient(135deg, #5d4aec 0%, #9489f4 100%);
+        }
+        .back-button:active {
+            transform: translateY(1px);
+        }
+        .back-button::before {
+            content: '';
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            transition: transform 0.3s;
+        }
+        .back-button:hover::before {
+            transform: translateX(-3px);
+        }
+        .question {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 60px 0 25px;
+            color: #2d3436;
+            position: relative;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+        .question::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #6c5ce7, #00cec9);
+            border-radius: 3px;
+        }
+        .drag-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        .draggable {
+            width: 180px;
+            height: 80px;
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            cursor: move;
+            user-select: none;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 6px 12px rgba(108, 92, 231, 0.2);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .draggable:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(108, 92, 231, 0.3);
+        }
+        #LZ {
+            background: linear-gradient(135deg, #e17055 0%, #fab1a0 100%);
+            box-shadow: 0 6px 12px rgba(225, 112, 85, 0.2);
+        }
+        #LZ:hover {
+            box-shadow: 0 10px 20px rgba(225, 112, 85, 0.3);
+        }
+        .image-container {
+            position: relative;
+            margin: 20px auto;
+            max-width: 800px;
+            height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border: 2px solid #dfe6e9;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        .drop-target {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 85%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: modalFadeIn 0.4s ease-out;
+        }
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .next-btn {
+            background: linear-gradient(135deg, #00b894 0%, #55efc4 100%);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 25px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0, 184, 148, 0.3);
+        }
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 184, 148, 0.4);
+            background: linear-gradient(135deg, #00a884 0%, #4ad4b4 100%);
+        }
+        #resultText {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        .score-display {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            font-size: 16px;
+            font-weight: bold;
+            color: #2d3436;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+        }
+        .score-display::before {
+            content: '🏆';
+            margin-right: 8px;
+            font-size: 18px;
+        }
+        #scoreDisplay {
+            color: #6c5ce7;
+            font-weight: bold;
+            margin: 0 5px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+            .back-button, .score-display {
+                top: 15px;
+                left: 15px;
+                right: 15px;
+                padding: 10px 15px;
+            }
+            .question {
+                font-size: 20px;
+                margin-top: 50px;
+            }
+            .draggable {
+                width: 140px;
+                height: 70px;
+                font-size: 18px;
+            }
+            .image-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 返回按钮 -->
+    <a href="xxly.html" class="back-button">返回学习乐园</a>
+
+    <!-- 分数显示 -->
+    <div class="score-display">
+        得分: <span id="scoreDisplay">0</span>/4
+    </div>
+
+    <div class="question">请将正确的米粉名称拖到图片上：</div>
+    
+    <div class="drag-container">
+        <div id="GL" class="draggable" draggable="true">桂林米粉</div>
+        <div id="LZ" class="draggable" draggable="true">柳州螺蛳粉</div>
+    </div>
+    
+    <div class="image-container">
+        <img src="glmf.png" alt="桂林米粉图片">
+        <div class="drop-target" id="dropTarget"></div>
+    </div>
+
+    <!-- 弹窗 -->
+    <div id="resultModal" class="modal">
+        <div class="modal-content">
+            <p id="resultText"></p>
+            <button id="nextBtn" class="next-btn" style="display: none;">下一题</button>
+        </div>
+    </div>
+
+    <script>
+        // 获取DOM元素
+        const draggables = document.querySelectorAll('.draggable');
+        const dropTarget = document.getElementById('dropTarget');
+        const modal = document.getElementById('resultModal');
+        const resultText = document.getElementById('resultText');
+        const nextBtn = document.getElementById('nextBtn');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        
+        // 初始化分数
+        function initScore() {
+            if (!localStorage.getItem('quizScore')) {
+                localStorage.setItem('quizScore', '0');
+            }
+            scoreDisplay.textContent = localStorage.getItem('quizScore');
+        }
+        
+        // 为每个可拖曳元素添加事件监听器
+        draggables.forEach(draggable => {
+            draggable.addEventListener('dragstart', dragStart);
+            draggable.addEventListener('dragend', dragEnd);
+        });
+        
+        // 为放置目标添加事件监听器
+        dropTarget.addEventListener('dragover', dragOver);
+        dropTarget.addEventListener('dragenter', dragEnter);
+        dropTarget.addEventListener('dragleave', dragLeave);
+        dropTarget.addEventListener('drop', drop);
+        
+        // 拖曳开始事件
+        function dragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.id);
+            e.target.style.opacity = '0.6';
+            e.target.style.transform = 'scale(0.95)';
+        }
+        
+        // 拖曳结束事件
+        function dragEnd(e) {
+            e.target.style.opacity = '1';
+            e.target.style.transform = 'scale(1)';
+        }
+        
+        // 拖曳经过放置区域事件
+        function dragOver(e) {
+            e.preventDefault();
+            e.target.style.border = '3px dashed #6c5ce7';
+            e.target.style.backgroundColor = 'rgba(108, 92, 231, 0.1)';
+        }
+        
+        function dragEnter(e) {
+            e.preventDefault();
+        }
+        
+        function dragLeave(e) {
+            e.target.style.border = 'none';
+            e.target.style.backgroundColor = 'transparent';
+        }
+        
+        // 放置事件
+        function drop(e) {
+            e.preventDefault();
+            e.target.style.border = 'none';
+            e.target.style.backgroundColor = 'transparent';
+            
+            const id = e.dataTransfer.getData('text/plain');
+            const draggedElement = document.getElementById(id);
+            
+            // 重置所有可拖曳元素的样式
+            draggables.forEach(el => {
+                el.style.opacity = '1';
+                el.style.transform = 'scale(1)';
+            });
+            
+            // 检查答案
+            if (id === 'GL') {
+                resultText.textContent = "🎉 你真棒，答对了！";
+                nextBtn.style.display = "inline-block";
+                
+                // 如果之前没答对过这道题，增加分数
+                if (!localStorage.getItem('q3Answered')) {
+                    const currentScore = parseInt(localStorage.getItem('quizScore'));
+                    localStorage.setItem('quizScore', (currentScore + 1).toString());
+                    scoreDisplay.textContent = currentScore + 1;
+                    localStorage.setItem('q3Answered', 'true');
+                }
+            } else {
+                resultText.textContent = "😅 正确答案是：桂林米粉，请继续努力！";
+                nextBtn.style.display = "none";
+            }
+            
+            modal.style.display = "block";
+        }
+        
+        // 下一题按钮事件
+        nextBtn.addEventListener('click', function() {
+            window.location.href = "test04.html";
+        });
+        
+        // 点击模态框外部关闭模态框
+        window.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        });
+        
+        // 页面加载时初始化
+        window.onload = initScore;
+    </script>
+</body>
+</html>

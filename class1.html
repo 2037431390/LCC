@@ -1,0 +1,510 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英文打字练习游戏</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --primary-dark: #2E7D32;
+            --primary-light: #81C784;
+            --secondary-color: #2196F3;
+            --secondary-dark: #1976D2;
+            --background: #f5f7fa;
+            --card-bg: #ffffff;
+            --text-dark: #333333;
+            --text-medium: #555555;
+            --text-light: #777777;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            color: var(--text-dark);
+        }
+        
+        #header-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 15px 30px;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+        
+        #header-panel:hover {
+            box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+        }
+        
+        #speed-control {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        #game-container {
+            width: 820px;
+            height: 520px;
+            margin: 0 auto;
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        #game-container:hover {
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.15);
+        }
+        
+        #game-area {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background: linear-gradient(to bottom, #f9f9f9 0%, #ffffff 100%);
+        }
+        
+        .letter {
+            position: absolute;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-dark);
+            user-select: none;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .letter.fade-out {
+            transform: scale(1.8);
+            opacity: 0;
+            filter: blur(2px);
+        }
+        
+        .letter.correct {
+            color: var(--primary-color);
+            text-shadow: 0 0 8px rgba(76, 175, 80, 0.4);
+        }
+        
+        button {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            outline: none;
+        }
+        
+        button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        button.active {
+            background-color: var(--primary-dark);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        #game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            z-index: 100;
+            border-radius: 16px;
+            backdrop-filter: blur(4px);
+        }
+        
+        #game-over h2 {
+            font-size: 42px;
+            margin-bottom: 30px;
+            color: white;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            font-weight: 600;
+        }
+        
+        #game-over p {
+            font-size: 24px;
+            margin-bottom: 40px;
+            max-width: 80%;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.9);
+        }
+        
+        #game-over button {
+            margin: 0 20px;
+            padding: 12px 28px;
+            font-size: 18px;
+            min-width: 120px;
+        }
+        
+        .stat {
+            font-size: 18px;
+            font-weight: 600;
+            min-width: 120px;
+            color: var(--text-medium);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .stat span {
+            color: var(--primary-dark);
+            font-size: 22px;
+            font-weight: 700;
+        }
+        
+        #return-btn {
+            background-color: #607d8b;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 8px;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        #return-btn:hover {
+            background-color: #546e7a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+        
+        #start-btn {
+            background-color: var(--secondary-color);
+            padding: 12px 28px;
+            font-weight: 600;
+        }
+        
+        #start-btn:hover {
+            background-color: var(--secondary-dark);
+        }
+        
+        .speed-label {
+            color: var(--text-medium);
+            font-weight: 500;
+            font-size: 16px;
+        }
+        
+        /* 添加一些装饰元素 */
+        .decorative-corner {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--primary-light) 0%, rgba(129, 199, 132, 0) 70%);
+            filter: blur(10px);
+            z-index: -1;
+        }
+        
+        .decorative-corner:nth-child(1) {
+            top: -50px;
+            left: -50px;
+        }
+        
+        .decorative-corner:nth-child(2) {
+            bottom: -50px;
+            right: -50px;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 900px) {
+            #game-container {
+                width: 95%;
+                height: 400px;
+            }
+            
+            #header-panel {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+            }
+            
+            .header-left, .header-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="decorative-corner"></div>
+    <div class="decorative-corner"></div>
+    
+    <div id="header-panel">
+        <div class="header-left">
+            <a href="dzlx.html" id="return-btn">← 返回</a>
+            <div class="stat">
+                <span>得分:</span>
+                <span id="score">0</span>
+            </div>
+        </div>
+        <div id="speed-control">
+            <span class="speed-label">下落速度:</span>
+            <button id="slow-btn" class="active">慢速</button>
+            <button id="medium-btn">中速</button>
+            <button id="fast-btn">快速</button>
+        </div>
+        <div class="header-right">
+            <div class="stat">
+                <span>时间:</span>
+                <span id="time">60</span>
+                <span>秒</span>
+            </div>
+            <button id="start-btn">开始游戏</button>
+        </div>
+    </div>
+
+    <div id="game-container">
+        <div id="game-area"></div>
+        <div id="game-over">
+            <h2>游戏结束!</h2>
+            <p id="result-message"></p>
+            <div>
+                <button id="next-level-btn">前往下一关</button>
+                <button id="continue-btn">继续练习</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 游戏变量
+        let score = 0;
+        let timeLeft = 60;
+        let gameActive = false;
+        let timer;
+        let letterInterval;
+        let fallIntervals = [];
+        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const gameArea = document.getElementById('game-area');
+        const gameOverScreen = document.getElementById('game-over');
+        const resultMessage = document.getElementById('result-message');
+        
+        // 速度设置
+        let speedSettings = {
+            slow: { spawnInterval: 2000, fallSpeed: { min: 0.3, max: 0.7 } },
+            medium: { spawnInterval: 1000, fallSpeed: { min: 0.8, max: 1.5 } },
+            fast: { spawnInterval: 500, fallSpeed: { min: 1.5, max: 3 } }
+        };
+        let currentSpeed = 'slow';
+        
+        // 开始游戏
+        document.getElementById('start-btn').addEventListener('click', startGame);
+        
+        // 速度控制按钮
+        document.getElementById('slow-btn').addEventListener('click', () => setSpeed('slow'));
+        document.getElementById('medium-btn').addEventListener('click', () => setSpeed('medium'));
+        document.getElementById('fast-btn').addEventListener('click', () => setSpeed('fast'));
+        
+        // 下一关按钮
+        document.getElementById('next-level-btn').addEventListener('click', () => {
+            window.location.href = 'class2.html';
+        });
+        
+        // 继续练习按钮
+        document.getElementById('continue-btn').addEventListener('click', () => {
+            gameOverScreen.style.display = 'none';
+            startGame();
+        });
+        
+        // 键盘事件监听
+        document.addEventListener('keydown', handleKeyPress);
+        
+        function setSpeed(speed) {
+            currentSpeed = speed;
+            // 更新按钮样式
+            document.getElementById('slow-btn').classList.remove('active');
+            document.getElementById('medium-btn').classList.remove('active');
+            document.getElementById('fast-btn').classList.remove('active');
+            document.getElementById(`${speed}-btn`).classList.add('active');
+            
+            // 如果游戏正在进行中，调整速度
+            if (gameActive) {
+                clearInterval(letterInterval);
+                letterInterval = setInterval(createLetter, speedSettings[speed].spawnInterval);
+            }
+        }
+        
+        function startGame() {
+            // 重置游戏状态
+            score = 0;
+            timeLeft = 60;
+            gameActive = true;
+            
+            // 清空游戏区域和下落间隔
+            gameArea.innerHTML = '';
+            fallIntervals.forEach(clearInterval);
+            fallIntervals = [];
+            
+            // 更新显示
+            document.getElementById('score').textContent = score;
+            document.getElementById('time').textContent = timeLeft;
+            
+            // 隐藏开始按钮
+            document.getElementById('start-btn').style.display = 'none';
+            
+            // 启动计时器
+            timer = setInterval(updateTimer, 1000);
+            
+            // 开始生成字母（使用当前速度设置）
+            letterInterval = setInterval(createLetter, speedSettings[currentSpeed].spawnInterval);
+        }
+        
+        function updateTimer() {
+            timeLeft--;
+            document.getElementById('time').textContent = timeLeft;
+            
+            if (timeLeft <= 0) {
+                endGame();
+            }
+        }
+        
+        function createLetter() {
+            if (!gameActive) return;
+            
+            // 随机选择一个字母
+            const letter = letters[Math.floor(Math.random() * letters.length)];
+            
+            // 创建字母元素
+            const letterElement = document.createElement('div');
+            letterElement.className = 'letter';
+            letterElement.textContent = letter;
+            letterElement.dataset.letter = letter;
+            
+            // 随机位置 (顶部)
+            const leftPos = Math.random() * (gameArea.offsetWidth - 30);
+            letterElement.style.left = leftPos + 'px';
+            letterElement.style.top = '0px';
+            
+            // 添加到游戏区域
+            gameArea.appendChild(letterElement);
+            
+            // 字母下落动画（使用当前速度设置）
+            const speedSetting = speedSettings[currentSpeed].fallSpeed;
+            const fallSpeed = speedSetting.min + Math.random() * (speedSetting.max - speedSetting.min);
+            
+            const fallInterval = setInterval(() => {
+                if (!gameActive) {
+                    clearInterval(fallInterval);
+                    return;
+                }
+                
+                const currentTop = parseFloat(letterElement.style.top);
+                const newTop = currentTop + fallSpeed;
+                letterElement.style.top = newTop + 'px';
+                
+                // 如果字母落到底部，移除它
+                if (newTop > gameArea.offsetHeight - 30) {
+                    clearInterval(fallInterval);
+                    letterElement.remove();
+                }
+            }, 20);
+            
+            fallIntervals.push(fallInterval);
+        }
+        
+        function handleKeyPress(e) {
+            if (!gameActive) return;
+            
+            const keyPressed = e.key.toUpperCase();
+            const lettersOnScreen = document.querySelectorAll('.letter:not(.fade-out)');
+            
+            // 检查是否有匹配的字母
+            let letterFound = false;
+            lettersOnScreen.forEach(letter => {
+                if (letter.dataset.letter === keyPressed) {
+                    // 标记为正确并添加消失效果
+                    letter.classList.add('correct', 'fade-out');
+                    
+                    // 增加得分
+                    score++;
+                    document.getElementById('score').textContent = score;
+                    letterFound = true;
+                    
+                    // 动画结束后移除元素
+                    setTimeout(() => {
+                        letter.remove();
+                    }, 300);
+                }
+            });
+            
+            // 如果找到匹配的字母，阻止默认事件
+            if (letterFound) {
+                e.preventDefault();
+            }
+        }
+        
+        function endGame() {
+            gameActive = false;
+            clearInterval(timer);
+            clearInterval(letterInterval);
+            fallIntervals.forEach(clearInterval);
+            fallIntervals = [];
+            
+            // 显示游戏结束屏幕
+            gameOverScreen.style.display = 'flex';
+            
+            // 根据得分显示不同消息
+            if (score >= 30) {
+                resultMessage.textContent = `恭喜！您的得分是 ${score} 分，初级训练已经合格！\n是否前往更具挑战性的下一关？`;
+                document.getElementById('next-level-btn').style.display = 'inline-block';
+            } else {
+                resultMessage.textContent = `您的得分是 ${score} 分。\n继续练习以达到30分以上，您一定能做到！`;
+                document.getElementById('next-level-btn').style.display = 'none';
+            }
+            
+            // 重新显示开始按钮
+            document.getElementById('start-btn').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

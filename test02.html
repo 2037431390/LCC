@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线考试 - 多选题</title>
+    <style>
+        body {
+            font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            position: relative;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+        }
+        .back-button {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            padding: 12px 20px 12px 15px;
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            border: none;
+            outline: none;
+            font-size: 16px;
+        }
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(108, 92, 231, 0.4);
+            background: linear-gradient(135deg, #5d4aec 0%, #9489f4 100%);
+        }
+        .back-button:active {
+            transform: translateY(1px);
+        }
+        .back-button::before {
+            content: '';
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            transition: transform 0.3s;
+        }
+        .back-button:hover::before {
+            transform: translateX(-3px);
+        }
+        .question {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 60px 0 25px;
+            color: #2d3436;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        .question::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #6c5ce7, #00cec9);
+            border-radius: 3px;
+        }
+        .options {
+            margin-left: 10px;
+        }
+        .option {
+            margin: 15px 0;
+            padding: 15px 20px;
+            border: 2px solid #dfe6e9;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            background-color: white;
+            font-size: 18px;
+            color: #2d3436;
+            display: flex;
+            align-items: center;
+        }
+        .option:hover {
+            border-color: #a29bfe;
+            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.15);
+            transform: translateY(-2px);
+        }
+        .option input[type="checkbox"] {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            accent-color: #6c5ce7;
+        }
+        .submit-btn {
+            background: linear-gradient(135deg, #00b894 0%, #55efc4 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 18px;
+            margin-top: 30px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0, 184, 148, 0.3);
+        }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 184, 148, 0.4);
+            background: linear-gradient(135deg, #00a884 0%, #4ad4b4 100%);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 85%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: modalFadeIn 0.4s ease-out;
+        }
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .next-btn {
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 25px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3);
+        }
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(108, 92, 231, 0.4);
+            background: linear-gradient(135deg, #5d4aec 0%, #9489f4 100%);
+        }
+        .score-display {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            font-size: 16px;
+            font-weight: bold;
+            color: #2d3436;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+        }
+        .score-display::before {
+            content: '🏆';
+            margin-right: 8px;
+            font-size: 18px;
+        }
+        #scoreDisplay {
+            color: #6c5ce7;
+            font-weight: bold;
+            margin: 0 5px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 600px) {
+            body {
+                padding: 15px;
+            }
+            .back-button, .score-display {
+                top: 15px;
+                left: 15px;
+                right: 15px;
+                padding: 10px 15px;
+            }
+            .question {
+                font-size: 20px;
+                margin-top: 50px;
+            }
+            .option {
+                padding: 12px 15px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 返回按钮 -->
+    <a href="xxly.html" class="back-button">返回学习乐园</a>
+
+    <!-- 分数显示 -->
+    <div class="score-display">
+        得分: <span id="scoreDisplay">0</span>/4
+    </div>
+
+    <div class="question">桂林旅游学院都有哪些教学搂？（多选题）</div>
+    <div class="options" id="options-container">
+        <!-- 选项将通过JavaScript动态生成 -->
+    </div>
+    <button id="submitBtn" class="submit-btn">提交答案</button>
+
+    <!-- 弹窗 -->
+    <div id="resultModal" class="modal">
+        <div class="modal-content">
+            <p id="resultText" style="font-size: 18px; margin-bottom: 20px;"></p>
+            <button id="nextBtn" class="next-btn" style="display: none;">下一题</button>
+        </div>
+    </div>
+
+    <script>
+        // 定义选项和正确答案
+        const options = ["旅博楼", "旅勤楼", "旅政楼", "旅艺楼", "旅思楼", "旅志楼"];
+        const correctAnswers = ["旅博楼", "旅勤楼", "旅艺楼", "旅思楼", "旅志楼"];
+        
+        // 获取DOM元素
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        
+        // 初始化分数
+        function initScore() {
+            if (!localStorage.getItem('quizScore')) {
+                localStorage.setItem('quizScore', '0');
+            }
+            scoreDisplay.textContent = localStorage.getItem('quizScore');
+        }
+        
+        // 随机排列选项
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        
+        // 显示选项
+        function displayOptions() {
+            const container = document.getElementById('options-container');
+            const shuffledOptions = shuffleArray([...options]);
+            
+            shuffledOptions.forEach(option => {
+                const div = document.createElement('div');
+                div.className = 'option';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = option;
+                checkbox.value = option;
+                
+                const label = document.createElement('label');
+                label.htmlFor = option;
+                label.textContent = option;
+                
+                div.appendChild(checkbox);
+                div.appendChild(label);
+                container.appendChild(div);
+            });
+        }
+        
+        // 检查答案
+        function checkAnswers() {
+            const selectedOptions = [];
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            
+            checkboxes.forEach(checkbox => {
+                selectedOptions.push(checkbox.value);
+            });
+            
+            // 检查是否完全匹配正确答案
+            const isCorrect = selectedOptions.length === correctAnswers.length && 
+                              correctAnswers.every(answer => selectedOptions.includes(answer));
+            
+            const modal = document.getElementById('resultModal');
+            const resultText = document.getElementById('resultText');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            if (isCorrect) {
+                resultText.textContent = "🎉 你真棒，答对了！";
+                nextBtn.style.display = "inline-block";
+                
+                // 如果之前没答对过这道题，增加分数
+                if (!localStorage.getItem('q2Answered')) {
+                    const currentScore = parseInt(localStorage.getItem('quizScore'));
+                    localStorage.setItem('quizScore', (currentScore + 1).toString());
+                    scoreDisplay.textContent = currentScore + 1;
+                    localStorage.setItem('q2Answered', 'true');
+                }
+            } else {
+                resultText.textContent = `😅 正确答案是：${correctAnswers.join('、')}，请继续努力！`;
+                nextBtn.style.display = "none";
+            }
+            
+            modal.style.display = "block";
+        }
+        
+        // 下一题按钮事件
+        document.getElementById('nextBtn').addEventListener('click', function() {
+            window.location.href = "test03.html";
+        });
+        
+        // 提交按钮事件
+        document.getElementById('submitBtn').addEventListener('click', checkAnswers);
+        
+        // 点击模态框外部关闭模态框
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('resultModal');
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        });
+        
+        // 页面加载时初始化
+        window.onload = function() {
+            initScore();
+            displayOptions();
+        };
+    </script>
+</body>
+</html>

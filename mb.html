@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>秒表功能</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        .return-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 8px 15px;
+            background-color: #4a6fa5;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .stopwatch-img {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .stopwatch-img img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+        .time-display {
+            position: absolute;
+            top: 102px;
+            left: 136px;
+            width: 435px;
+            height: 106px;
+            font-size: 48px;
+            font-family: monospace;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(255,255,255,0.7);
+            border-radius: 5px;
+        }
+        .lap-times {
+            width: 100%;
+            text-align: left;
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+        .lap-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+        .lap-number {
+            font-weight: bold;
+            color: #666;
+        }
+        .lap-duration {
+            color: #333;
+        }
+        .lap-total {
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="ggx2.html" class="return-btn">返回</a>
+        <div class="stopwatch-img">
+            <img src="mb1.png" alt="秒表" usemap="#stopwatch-map">
+            <div class="time-display" id="display">00:00:00.000</div>
+            <map name="stopwatch-map">
+                <area shape="rect" coords="176,47,234,67" alt="开始" title="开始" onclick="toggleStartStop()">
+                <area shape="rect" coords="280,45,337,66" alt="计次" title="计次" onclick="recordLap()">
+                <area shape="rect" coords="384,46,439,60" alt="重置" title="重置" onclick="resetStopwatch()">
+                <area shape="rect" coords="495,47,543,64" alt="静音" title="静音" onclick="toggleMute()">
+            </map>
+        </div>
+        
+        <div class="lap-times" id="lapTimes">
+            <div style="text-align: center; color: #999; padding: 10px;" id="noLaps">暂无计次记录</div>
+        </div>
+    </div>
+
+    <audio id="tickSound" src="stopwatch.mp3" loop></audio>
+    <audio id="startSound" src="mb.M4A" loop></audio>
+
+    <script>
+        // 全局变量
+        let startTime = 0;
+        let elapsedTime = 0;
+        let timerInterval = null;
+        let isRunning = false;
+        let lastLapTime = 0;
+        let isMuted = false;
+        let lapCount = 0;
+        const tickAudio = document.getElementById('tickSound');
+        const startAudio = document.getElementById('startSound');
+        
+        // 格式化时间显示
+        function formatTime(timeInMilliseconds) {
+            const date = new Date(timeInMilliseconds);
+            const hours = date.getUTCHours().toString().padStart(2, '0');
+            const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+            const seconds = date.getUTCSeconds().toString().padStart(2, '0');
+            const milliseconds = date.getUTCMilliseconds().toString().padStart(3, '0');
+            return `${hours}:${minutes}:${seconds}.${milliseconds}`;
+        }
+        
+        // 更新显示
+        function updateDisplay() {
+            const currentTime = isRunning ? Date.now() - startTime + elapsedTime : elapsedTime;
+            document.getElementById('display').textContent = formatTime(currentTime);
+        }
+        
+        // 开始/暂停计时
+        function toggleStartStop() {
+            if (isRunning) {
+                // 暂停计时
+                clearInterval(timerInterval);
+                elapsedTime += Date.now() - startTime;
+                isRunning = false;
+                tickAudio.pause();
+                startAudio.pause();
+            } else {
+                // 开始计时
+                startTime = Date.now();
+                timerInterval = setInterval(updateDisplay, 10);
+                isRunning = true;
+                if (!isMuted) {
+                    tickAudio.currentTime = 0;
+                    tickAudio.play();
+                    startAudio.currentTime = 0;
+                    startAudio.play();
+                }
+            }
+        }
+        
+        // 记录计次
+        function recordLap() {
+            if (!isRunning && elapsedTime === 0) return;
+            
+            const currentTime = isRunning ? Date.now() - startTime + elapsedTime : elapsedTime;
+            const lapTime = currentTime - lastLapTime;
+            lastLapTime = currentTime;
+            lapCount++;
+            
+            const noLaps = document.getElementById('noLaps');
+            if (noLaps) noLaps.style.display = 'none';
+            
+            const lapTimesDiv = document.getElementById('lapTimes');
+            const lapItem = document.createElement('div');
+            lapItem.className = 'lap-item';
+            
+            const lapInfo = document.createElement('div');
+            lapInfo.innerHTML = `<span class="lap-number">计次 ${lapCount}</span> 
+                                <span class="lap-duration">间隔: ${formatTime(lapTime)}</span>`;
+            
+            const totalInfo = document.createElement('div');
+            totalInfo.className = 'lap-total';
+            totalInfo.textContent = `总计: ${formatTime(currentTime)}`;
+            
+            lapItem.appendChild(lapInfo);
+            lapItem.appendChild(totalInfo);
+            
+            lapTimesDiv.appendChild(lapItem);
+        }
+        
+        // 重置秒表
+        function resetStopwatch() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            startTime = 0;
+            elapsedTime = 0;
+            lastLapTime = 0;
+            lapCount = 0;
+            document.getElementById('display').textContent = '00:00:00.000';
+            document.getElementById('lapTimes').innerHTML = '<div style="text-align: center; color: #999; padding: 10px;" id="noLaps">暂无计次记录</div>';
+            tickAudio.pause();
+            startAudio.pause();
+        }
+        
+        // 切换静音
+        function toggleMute() {
+            isMuted = !isMuted;
+            if (isMuted) {
+                tickAudio.pause();
+                startAudio.pause();
+            } else if (isRunning) {
+                tickAudio.currentTime = 0;
+                tickAudio.play();
+                startAudio.currentTime = 0;
+                startAudio.play();
+            }
+        }
+
+        // 当音频结束时重新播放
+        startAudio.addEventListener('ended', function() {
+            if (isRunning && !isMuted) {
+                this.currentTime = 0;
+                this.play();
+            }
+        });
+    </script>
+</body>
+</html>

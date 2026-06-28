@@ -1,0 +1,813 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英文单词打字练习</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --primary-dark: #2980b9;
+            --primary-light: #89c4f4;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --background: linear-gradient(135deg, #f0f8ff 0%, #e6f2ff 100%);
+            --card-bg: #ffffff;
+            --text-dark: #2c3e50;
+            --text-medium: #34495e;
+            --text-light: #7f8c8d;
+            --border-color: #dfe6e9;
+            --highlight-color: #fffacd;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--background);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-dark);
+        }
+        
+        .header-container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .return-btn {
+            background-color: var(--text-medium);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .return-btn:hover {
+            background-color: var(--text-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        
+        .game-container {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 900px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .game-container:hover {
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.15);
+        }
+        
+        h1 {
+            color: var(--text-dark);
+            margin-bottom: 25px;
+            font-size: 32px;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 25px;
+            font-size: 1.3em;
+            background-color: rgba(52, 152, 219, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+        }
+        
+        .stats div {
+            font-weight: 600;
+            color: var(--text-medium);
+        }
+        
+        .stats span {
+            color: var(--primary-dark);
+            font-weight: 700;
+            font-size: 1.2em;
+            margin-left: 5px;
+        }
+        
+        .game-area {
+            width: 100%;
+            height: 450px;
+            border: 2px solid var(--primary-color);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            background-color: #f9f9f9;
+            margin-bottom: 25px;
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.05);
+        }
+        
+        .word {
+            position: absolute;
+            font-size: 26px;
+            font-weight: 600;
+            color: var(--text-dark);
+            user-select: none;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            padding: 8px 15px;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.85);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+        
+        .start-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .start-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+        
+        .start-btn:active {
+            transform: translateY(0);
+        }
+        
+        .pause-btn {
+            background-color: var(--warning-color);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .pause-btn:hover {
+            background-color: #e67e22;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+        
+        .speed-btn {
+            background-color: #f1f1f1;
+            color: var(--text-dark);
+            border: none;
+            padding: 12px 18px;
+            font-size: 16px;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .speed-btn:hover {
+            background-color: #e1e1e1;
+            transform: translateY(-2px);
+        }
+        
+        .speed-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 16px 32px rgba(0,0,0,0.2);
+            animation: modalFadeIn 0.4s ease;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal h2 {
+            color: var(--text-dark);
+            margin-bottom: 20px;
+            font-size: 32px;
+        }
+        
+        .modal p {
+            color: var(--text-medium);
+            font-size: 18px;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .modal-btn {
+            margin: 15px;
+            padding: 12px 28px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            min-width: 120px;
+        }
+        
+        .yes-btn {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .no-btn {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .continue-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            opacity: 0.95;
+        }
+        
+        .word-correct {
+            transform: scale(1.3);
+            background-color: var(--success-color);
+            color: white;
+            opacity: 0;
+            box-shadow: 0 0 20px rgba(46, 204, 113, 0.5);
+        }
+        
+        .input-area {
+            margin-top: 25px;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        #wordInput {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            border: 2px solid var(--primary-color);
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        
+        #wordInput:focus {
+            outline: none;
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+        }
+        
+        .instructions {
+            margin-top: 20px;
+            color: var(--text-light);
+            font-size: 16px;
+            font-style: italic;
+        }
+        
+        .controls {
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .speed-controls {
+            display: flex;
+            background-color: rgba(241, 241, 241, 0.7);
+            padding: 8px;
+            border-radius: 10px;
+        }
+        
+        .word-highlight {
+            background-color: var(--highlight-color);
+            box-shadow: 0 0 10px #ffeb3b;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .paused {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 42px;
+            font-weight: bold;
+            z-index: 50;
+            backdrop-filter: blur(3px);
+        }
+        
+        /* 装饰元素 */
+        .decorative-corner {
+            position: fixed;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--primary-light) 0%, rgba(137, 196, 244, 0) 70%);
+            filter: blur(30px);
+            z-index: -1;
+        }
+        
+        .decorative-corner:nth-child(1) {
+            top: -100px;
+            left: -100px;
+        }
+        
+        .decorative-corner:nth-child(2) {
+            bottom: -100px;
+            right: -100px;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .game-container {
+                padding: 20px;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .speed-controls {
+                margin-top: 15px;
+            }
+            
+            .game-area {
+                height: 350px;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="decorative-corner"></div>
+    <div class="decorative-corner"></div>
+    
+    <div class="header-container">
+        <a href="dzlx.html" class="return-btn">← 返回</a>
+        <h1>英文单词打字练习</h1>
+        <div style="width: 120px;"></div> <!-- 保持标题居中 -->
+    </div>
+
+    <div class="game-container">
+        <div class="stats">
+            <div>得分: <span id="score">0</span></div>
+            <div>时间: <span id="time">60</span>秒</div>
+        </div>
+        <div class="controls">
+            <button class="start-btn" id="startBtn">开始游戏</button>
+            <button class="pause-btn" id="pauseBtn" style="display: none;">暂停游戏</button>
+            <div class="speed-controls">
+                <button class="speed-btn active" id="slowBtn">慢速</button>
+                <button class="speed-btn" id="mediumBtn">中速</button>
+                <button class="speed-btn" id="fastBtn">快速</button>
+            </div>
+        </div>
+        <div class="game-area" id="gameArea"></div>
+        <div class="input-area">
+            <input type="text" id="wordInput" placeholder="输入屏幕上显示的单词" disabled>
+        </div>
+        <p class="instructions">输入屏幕上显示的单词，正确输入每个单词得10分</p>
+    </div>
+
+    <div class="modal" id="resultModal">
+        <div class="modal-content">
+            <h2 id="resultTitle">游戏结束</h2>
+            <p id="resultMessage">您的得分: <span style="font-weight: 700; color: var(--primary-dark);">0</span></p>
+            <div id="nextLevelOptions" style="display: none;">
+                <p>恭喜！您的中级训练已经合格！</p>
+                <p>是否前往更具挑战性的下一关？</p>
+                <div>
+                    <button class="modal-btn yes-btn" id="yesBtn">前往下一关</button>
+                    <button class="modal-btn no-btn" id="noBtn">留在本关</button>
+                </div>
+            </div>
+            <button class="modal-btn continue-btn" id="continueBtn" style="display: none;">继续练习</button>
+        </div>
+    </div>
+
+    <script>
+        // 获取DOM元素
+        const gameArea = document.getElementById('gameArea');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const scoreDisplay = document.getElementById('score');
+        const timeDisplay = document.getElementById('time');
+        const resultModal = document.getElementById('resultModal');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultMessage = document.getElementById('resultMessage');
+        const nextLevelOptions = document.getElementById('nextLevelOptions');
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const continueBtn = document.getElementById('continueBtn');
+        const wordInput = document.getElementById('wordInput');
+        const slowBtn = document.getElementById('slowBtn');
+        const mediumBtn = document.getElementById('mediumBtn');
+        const fastBtn = document.getElementById('fastBtn');
+
+        // 单词列表
+        const wordList = [
+            'apple', 'banana', 'orange', 'grape', 'pear',
+            'book', 'pen', 'pencil', 'ruler', 'eraser',
+            'happy', 'sad', 'angry', 'tired', 'excited',
+            'run', 'jump', 'swim', 'read', 'write',
+            'red', 'blue', 'green', 'yellow', 'black',
+            'one', 'two', 'three', 'four', 'five',
+            'dog', 'cat', 'bird', 'fish', 'rabbit',
+            'sun', 'moon', 'star', 'cloud', 'rain'
+        ];
+
+        // 游戏变量
+        let score = 0;
+        let timeLeft = 60;
+        let gameActive = false;
+        let gamePaused = false;
+        let timer;
+        let wordInterval;
+        let activeWords = {};
+        let currentSpeed = 'slow'; // 默认速度
+        let currentInput = '';
+        let animationFrameId;
+        
+        // 速度配置
+        const speedSettings = {
+            slow: {
+                wordSpeed: 0.1,   // 单词下落速度
+                spawnInterval: 6000 // 单词生成间隔(毫秒)
+            },
+            medium: {
+                wordSpeed: 0.5,
+                spawnInterval: 4500
+            },
+            fast: {
+                wordSpeed: 1.0,
+                spawnInterval: 2500
+            }
+        };
+
+        // 开始游戏
+        startBtn.addEventListener('click', startGame);
+
+        // 暂停/继续游戏
+        pauseBtn.addEventListener('click', togglePause);
+
+        // 速度按钮事件
+        slowBtn.addEventListener('click', () => setSpeed('slow'));
+        mediumBtn.addEventListener('click', () => setSpeed('medium'));
+        fastBtn.addEventListener('click', () => setSpeed('fast'));
+
+        function setSpeed(speed) {
+            currentSpeed = speed;
+            slowBtn.classList.remove('active');
+            mediumBtn.classList.remove('active');
+            fastBtn.classList.remove('active');
+            
+            if (speed === 'slow') {
+                slowBtn.classList.add('active');
+            } else if (speed === 'medium') {
+                mediumBtn.classList.add('active');
+            } else {
+                fastBtn.classList.add('active');
+            }
+
+            // 如果游戏正在进行中且未暂停，更新速度
+            if (gameActive && !gamePaused) {
+                clearInterval(wordInterval);
+                wordInterval = setInterval(createWords, speedSettings[currentSpeed].spawnInterval);
+                
+                // 更新现有单词的速度
+                for (const word in activeWords) {
+                    activeWords[word].speed = speedSettings[currentSpeed].wordSpeed * (0.8 + Math.random() * 0.4);
+                }
+            }
+        }
+
+        function togglePause() {
+            if (!gameActive) return;
+            
+            gamePaused = !gamePaused;
+            
+            if (gamePaused) {
+                // 暂停游戏
+                pauseBtn.textContent = '继续游戏';
+                clearInterval(timer);
+                clearInterval(wordInterval);
+                cancelAnimationFrame(animationFrameId);
+                
+                // 显示暂停遮罩
+                const pauseOverlay = document.createElement('div');
+                pauseOverlay.className = 'paused';
+                pauseOverlay.textContent = '游戏暂停';
+                pauseOverlay.id = 'pauseOverlay';
+                gameArea.appendChild(pauseOverlay);
+                
+                // 禁用输入框
+                wordInput.disabled = true;
+            } else {
+                // 继续游戏
+                pauseBtn.textContent = '暂停游戏';
+                
+                // 移除暂停遮罩
+                const pauseOverlay = document.getElementById('pauseOverlay');
+                if (pauseOverlay) {
+                    gameArea.removeChild(pauseOverlay);
+                }
+                
+                // 恢复计时器
+                timer = setInterval(updateTimer, 1000);
+                
+                // 恢复单词生成
+                wordInterval = setInterval(createWords, speedSettings[currentSpeed].spawnInterval);
+                
+                // 恢复单词移动
+                moveWords();
+                
+                // 启用输入框
+                wordInput.disabled = false;
+                wordInput.focus();
+            }
+        }
+
+        function startGame() {
+            // 重置游戏状态
+            score = 0;
+            timeLeft = 60;
+            gameActive = true;
+            gamePaused = false;
+            scoreDisplay.textContent = score;
+            timeDisplay.textContent = timeLeft;
+            gameArea.innerHTML = '';
+            activeWords = {};
+            wordInput.value = '';
+            currentInput = '';
+            
+            // 更新按钮状态
+            startBtn.style.display = 'none';
+            pauseBtn.style.display = 'inline-block';
+            pauseBtn.textContent = '暂停游戏';
+            slowBtn.disabled = false;
+            mediumBtn.disabled = false;
+            fastBtn.disabled = false;
+            
+            // 聚焦输入框
+            wordInput.disabled = false;
+            wordInput.focus();
+            
+            // 开始计时器
+            timer = setInterval(updateTimer, 1000);
+            
+            // 开始生成单词（根据当前速度设置间隔）
+            wordInterval = setInterval(createWords, speedSettings[currentSpeed].spawnInterval);
+            
+            // 首先生成一组单词
+            createWords();
+            
+            // 移动现有单词
+            moveWords();
+        }
+
+        // 更新计时器
+        function updateTimer() {
+            timeLeft--;
+            timeDisplay.textContent = timeLeft;
+            
+            if (timeLeft <= 0) {
+                endGame();
+            }
+        }
+
+        // 创建随机单词（一次5个）
+        function createWords() {
+            if (!gameActive || gamePaused) return;
+            
+            // 确保不会重复生成相同的单词
+            const availableWords = wordList.filter(word => !activeWords[word]);
+            
+            // 如果可用单词不足5个，只生成可用的数量
+            const count = Math.min(5, availableWords.length);
+            
+            for (let i = 0; i < count; i++) {
+                const randomIndex = Math.floor(Math.random() * availableWords.length);
+                const word = availableWords[randomIndex];
+                
+                // 从可用单词中移除已选单词
+                availableWords.splice(randomIndex, 1);
+                
+                createWord(word);
+            }
+        }
+
+        // 创建单个单词
+        function createWord(word) {
+            const wordElement = document.createElement('div');
+            wordElement.className = 'word';
+            wordElement.textContent = word;
+            wordElement.id = `word-${word}`;
+            
+            // 随机水平位置
+            const leftPos = Math.random() * (gameArea.offsetWidth - 150);
+            
+            wordElement.style.left = `${leftPos}px`;
+            wordElement.style.top = '0px';
+            
+            gameArea.appendChild(wordElement);
+            
+            // 存储单词及其元素（使用当前速度设置）
+            activeWords[word] = {
+                element: wordElement,
+                top: 0,
+                left: leftPos,
+                speed: speedSettings[currentSpeed].wordSpeed * (0.8 + Math.random() * 0.4) // 在基础速度上有些随机变化
+            };
+        }
+
+        // 移动单词
+        function moveWords() {
+            if (!gameActive || gamePaused) return;
+            
+            for (const word in activeWords) {
+                const wordData = activeWords[word];
+                wordData.top += wordData.speed;
+                wordData.element.style.top = `${wordData.top}px`;
+                
+                // 检查单词是否超出底部
+                if (wordData.top > gameArea.offsetHeight) {
+                    gameArea.removeChild(wordData.element);
+                    delete activeWords[word];
+                }
+            }
+            
+            animationFrameId = requestAnimationFrame(moveWords);
+        }
+
+        // 输入框事件监听 - 实时检测输入
+        wordInput.addEventListener('input', (e) => {
+            if (!gameActive || gamePaused) return;
+            
+            currentInput = wordInput.value.trim().toLowerCase();
+            
+            // 移除所有高亮
+            document.querySelectorAll('.word-highlight').forEach(el => {
+                el.classList.remove('word-highlight');
+            });
+            
+            // 检查是否有匹配的单词
+            for (const word in activeWords) {
+                if (word.startsWith(currentInput)) {
+                    // 高亮显示匹配的单词
+                    activeWords[word].element.classList.add('word-highlight');
+                    
+                    // 如果完全匹配
+                    if (word === currentInput) {
+                        // 正确输入单词，添加效果
+                        activeWords[word].element.classList.add('word-correct');
+                        
+                        // 短暂延迟后移除单词
+                        setTimeout(() => {
+                            if (activeWords[word]) {
+                                gameArea.removeChild(activeWords[word].element);
+                                delete activeWords[word];
+                                score += 10;
+                                scoreDisplay.textContent = score;
+                            }
+                        }, 300);
+                        
+                        // 清空输入框
+                        wordInput.value = '';
+                        currentInput = '';
+                        break;
+                    }
+                }
+            }
+        });
+
+        // 结束游戏
+        function endGame() {
+            gameActive = false;
+            gamePaused = false;
+            clearInterval(timer);
+            clearInterval(wordInterval);
+            cancelAnimationFrame(animationFrameId);
+            
+            // 更新按钮状态
+            startBtn.style.display = 'inline-block';
+            pauseBtn.style.display = 'none';
+            slowBtn.disabled = false;
+            mediumBtn.disabled = false;
+            fastBtn.disabled = false;
+            
+            // 禁用输入框
+            wordInput.disabled = true;
+            
+            // 显示结果
+            resultTitle.textContent = score >= 100 ? '恭喜完成!' : '游戏结束';
+            resultMessage.innerHTML = `您的得分: <span style="font-size: 1.2em; font-weight: 700;">${score}</span>`;
+            
+            if (score >= 100) {
+                nextLevelOptions.style.display = 'block';
+                continueBtn.style.display = 'none';
+            } else {
+                nextLevelOptions.style.display = 'none';
+                continueBtn.style.display = 'inline-block';
+            }
+            
+            resultModal.style.display = 'flex';
+        }
+
+        // 模态框按钮事件
+        yesBtn.addEventListener('click', () => {
+            window.location.href = 'class3.html';
+        });
+
+        noBtn.addEventListener('click', () => {
+            resultModal.style.display = 'none';
+        });
+
+        continueBtn.addEventListener('click', () => {
+            resultModal.style.display = 'none';
+            startGame();
+        });
+    </script>
+</body>
+</html>
